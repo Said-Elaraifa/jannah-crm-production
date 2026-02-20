@@ -4,7 +4,8 @@ import { Chart, registerables } from 'chart.js';
 import {
     TrendingUp, TrendingDown, Calculator, Link as LinkIcon,
     CheckSquare, BarChart2, Copy, RefreshCw, ExternalLink,
-    PieChart, Target, Zap, MousePointer, DollarSign
+    PieChart, Target, Zap, MousePointer, DollarSign,
+    Sparkles, Loader2, MessageSquareText
 } from 'lucide-react';
 import { getAdsKpis, getAdsCampaigns } from '../services/supabase';
 import { predictAdsRoi } from '../services/gemini';
