@@ -28,12 +28,18 @@ function getRouteInfo() {
 }
 
 // Global loading screen
-function LoadingScreen() {
+function LoadingScreen({ message = "Chargement OS1.0..." }) {
   return (
-    <div className="flex h-screen bg-bg-dark items-center justify-center">
-      <div className="text-center">
-        <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-slate-400 text-sm font-medium">Chargement OS1.0...</p>
+    <div className="flex h-screen bg-[#0b141d] items-center justify-center">
+      <div className="text-center animate-fade-in">
+        <div className="relative mb-6">
+          <div className="w-16 h-16 border-4 border-primary/10 border-t-primary rounded-full animate-spin mx-auto" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-8 h-8 bg-primary/20 rounded-full animate-pulse" />
+          </div>
+        </div>
+        <p className="text-white font-display font-bold text-lg tracking-tight mb-2">{message}</p>
+        <p className="text-slate-500 text-xs font-medium uppercase tracking-[0.2em]">Initialisation des protocoles...</p>
       </div>
     </div>
   );
@@ -57,9 +63,19 @@ export default function App() {
   const { aiLogs, setAiLogs, loading: aiLogsLoading, addAiLog, removeAiLog } = useAiLogs();
 
   useEffect(() => {
-    // Check current session
+    // Check current session with timeout guard
+    const authTimeout = setTimeout(() => {
+      console.warn("Auth timeout reached, forcing load");
+      setAuthLoading(false);
+    }, 5000);
+
     db.supabase.auth.getSession().then(({ data: { session } }) => {
+      clearTimeout(authTimeout);
       setSession(session);
+      setAuthLoading(false);
+    }).catch(err => {
+      console.error("Auth session error:", err);
+      clearTimeout(authTimeout);
       setAuthLoading(false);
     });
 
@@ -75,7 +91,7 @@ export default function App() {
     if (session?.user) {
       // Find team member by email or use defaults from metadata
       db.getTeamMembers().then(members => {
-        const match = members.find(m => m.email === session.user.email);
+        const match = Array.isArray(members) ? members.find(m => m.email === session.user.email) : null;
         if (match) {
           setCurrentUser(match);
         } else {
@@ -87,6 +103,15 @@ export default function App() {
             text_color: 'text-primary'
           });
         }
+      }).catch(err => {
+        console.error("Failed to fetch team members:", err);
+        setCurrentUser({
+          name: session.user.email.split('@')[0],
+          role: 'Membre (Fallback)',
+          initial: '?',
+          color: 'bg-slate-500',
+          text_color: 'text-white'
+        });
       });
     } else {
       setCurrentUser(null);
