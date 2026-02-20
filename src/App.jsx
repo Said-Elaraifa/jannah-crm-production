@@ -118,13 +118,19 @@ export default function App() {
     }
   }, [session]);
 
-  const isLoading = authLoading || (session && (clientsLoading || leadsLoading || sopsLoading || aiLogsLoading)) || (session && !currentUser);
+  // Progressive Loading: Don't block the whole UI frame
+  // We only wait for auth session to decide between Login or App
+  if (authLoading) return <LoadingScreen message="Vérification de l'identité..." />;
+
+  if (!session) {
+    console.log("[APP] Pas de session, direction Login.");
+    return <Login />;
+  }
 
   // Public cahier des charges route
   if (route.type === 'cahier') {
     const client = clients.find(c => c.slug === route.slug);
     const handleComplete = async (data) => {
-      // Update client status in Supabase
       if (client) {
         await editClient(client.id, {
           cahier_completed: true,
@@ -140,10 +146,6 @@ export default function App() {
       />
     );
   }
-
-  if (isLoading) return <LoadingScreen />;
-
-  if (!session) return <Login />;
 
   const handleReplayPrompt = (query) => {
     setChatInitialMessage(query);
