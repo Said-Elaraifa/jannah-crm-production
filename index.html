@@ -12,7 +12,42 @@
 </head>
 
 <body>
+  <div id="boot-status"
+    style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#12202c;border:1px solid #c3dc7f;color:#c3dc7f;padding:20px 40px;border-radius:15px;font-family:monospace;z-index:9999999;box-shadow:0 0 50px rgba(195,220,127,0.1);text-align:center;">
+    <div style="font-size:24px;font-weight:bold;margin-bottom:10px;">JANNAH OS BOOT</div>
+    <div id="boot-msg" style="font-size:14px;opacity:0.8;">[Étape 0] Initialisation du matériel...</div>
+  </div>
+
+  <script>
+    (function () {
+      const msg = document.getElementById('boot-msg');
+      window.JANNAH_LOG = function (txt) {
+        console.log('[HTML_BOOT] ' + txt);
+        if (msg) msg.innerText = txt;
+      };
+
+      window.onerror = function (message, source, lineno, colno, error) {
+        window.JANNAH_LOG('❌ ERREUR CRITIQUE : ' + message);
+        const div = document.createElement('div');
+        div.style.cssText = 'position:fixed;inset:0;background:#1a0000;color:#ff4444;padding:40px;z-index:99999999;font-family:monospace;overflow:auto;';
+        div.innerHTML = '<h1 style="border-bottom:2px solid red;padding-bottom:10px;">🛑 CRASH DU NOYAU</h1>' +
+          '<p style="font-size:18px;">' + message + '</p>' +
+          '<div style="background:rgba(0,0,0,0.5);padding:20px;border-radius:10px;color:#aaa;">' +
+          'Source: ' + source + ' (' + lineno + ':' + colno + ')<br><br>' +
+          '<pre>' + (error ? error.stack : 'No stacktrace') + '</pre></div>' +
+          '<button onclick="location.reload()" style="margin-top:20px;padding:10px 20px;background:#ff4444;color:white;border:none;border-radius:5px;cursor:pointer;">REDÉMARRER</button>';
+        document.body.appendChild(div);
+        return false;
+      };
+
+      window.JANNAH_LOG('[Étape 1] Système HTML prêt.');
+    })();
+  </script>
+
   <div id="root"></div>
+  <script type="module">
+    window.JANNAH_LOG('[Étape 2] Chargement des modules JS...');
+  </script>
   <script type="module" src="/src/main.jsx"></script>
 </body>
 
