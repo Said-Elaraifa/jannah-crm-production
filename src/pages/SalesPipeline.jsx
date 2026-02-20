@@ -8,6 +8,7 @@ import {
     Sparkles, Loader2, MessageSquareText
 } from 'lucide-react';
 import { TEAM_MEMBERS } from '../data/constants';
+import { supabase, getIntegrations, updateLeadRecord } from '../services/supabase';
 import { analyzeLeadStrategic } from '../services/gemini';
 
 const STAGES = [
@@ -310,10 +311,8 @@ function LeadCard({ lead, stages, onMove, onDelete, onEdit, onAudit, onDragStart
     );
 }
 
-// --- Main Page ---
 
-import { supabase, getIntegrations, updateLeadRecord } from '../services/supabase';
-import { analyzeLeadStrategic } from '../services/gemini';
+// --- Main Page ---
 
 export default function SalesPipeline({ leads, setLeads, onAddLead, onEditLead, onMoveLead, onDeleteLead }) {
     const [isSyncing, setIsSyncing] = useState(false);
