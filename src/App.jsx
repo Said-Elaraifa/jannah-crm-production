@@ -1,17 +1,22 @@
 // src/App.jsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Sidebar from './components/layout/Sidebar';
 import Header from './components/layout/Header';
 import ChatPanel from './components/chat/ChatPanel';
 import Dashboard from './pages/Dashboard';
 import SalesPipeline from './pages/SalesPipeline';
+import BillingView from './pages/BillingView';
 import ClientsProjects from './pages/ClientsProjects';
 import Analytics from './pages/Analytics';
 import AILogs from './pages/AILogs';
 import SOPs from './pages/SOPs';
 import Settings from './pages/Settings';
+import Tools from './pages/Tools';
 import CahierDesCharges from './pages/CahierDesCharges';
+import ClientPortfolio from './pages/ClientPortfolio';
 import Login from './pages/Login';
+import { AddClientModal } from './features/clients/components/AddClientModal';
+import { ThemeProvider } from './contexts/ThemeContext';
 import { useClients } from './hooks/useClients';
 import { useLeads } from './hooks/useLeads';
 import { useSops } from './hooks/useSops';
@@ -27,23 +32,7 @@ function getRouteInfo() {
   return { type: 'app' };
 }
 
-// Global loading screen
-function LoadingScreen({ message = "Chargement OS1.0..." }) {
-  return (
-    <div className="flex h-screen bg-[#0b141d] items-center justify-center">
-      <div className="text-center animate-fade-in">
-        <div className="relative mb-6">
-          <div className="w-16 h-16 border-4 border-primary/10 border-t-primary rounded-full animate-spin mx-auto" />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-8 h-8 bg-primary/20 rounded-full animate-pulse" />
-          </div>
-        </div>
-        <p className="text-white font-display font-bold text-lg tracking-tight mb-2">{message}</p>
-        <p className="text-slate-500 text-xs font-medium uppercase tracking-[0.2em]">Initialisation des protocoles...</p>
-      </div>
-    </div>
-  );
-}
+import { LoadingScreen } from './components/ui';
 
 export default function App() {
   const route = getRouteInfo();
@@ -55,12 +44,27 @@ export default function App() {
   const [session, setSession] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const [isAddClientModalOpen, setIsAddClientModalOpen] = useState(false);
 
   // Supabase-backed data hooks
-  const { clients, setClients, loading: clientsLoading, addClient, editClient, removeClient } = useClients();
-  const { leads, setLeads, loading: leadsLoading, addLead, editLead, removeLead, moveLead } = useLeads();
-  const { sops, setSops, loading: sopsLoading, addSop, editSop, removeSop } = useSops();
-  const { aiLogs, setAiLogs, loading: aiLogsLoading, addAiLog, removeAiLog } = useAiLogs();
+  const { clients, setClients, addClient, editClient, removeClient } = useClients();
+  const { leads, setLeads, addLead, editLead, removeLead, moveLead } = useLeads();
+  const { sops, setSops, addSop, editSop, removeSop } = useSops();
+  const { aiLogs, setAiLogs, addAiLog, removeAiLog } = useAiLogs();
+
+  const handleReplayPrompt = useCallback((query) => {
+    setChatInitialMessage(query);
+    setChatOpen(true);
+    setActiveTab('AIChat');
+  }, []);
+
+  const handleViewCahier = useCallback((client) => {
+    window.open(`/cahier/${client.slug}`, '_blank');
+  }, []);
+
+  const handleNewClient = useCallback(() => {
+    setIsAddClientModalOpen(true);
+  }, []);
 
   useEffect(() => {
     // Check current session with timeout guard
@@ -98,6 +102,7 @@ export default function App() {
           setCurrentUser({
             name: session.user.email.split('@')[0],
             role: 'Membre',
+            roleId: 'admin', // Default to admin for now to allow dashboard access
             initial: session.user.email.charAt(0).toUpperCase(),
             color: 'bg-accent',
             text_color: 'text-primary'
@@ -108,12 +113,14 @@ export default function App() {
         setCurrentUser({
           name: session.user.email.split('@')[0],
           role: 'Membre (Fallback)',
+          roleId: 'admin', // Fallback to admin
           initial: '?',
           color: 'bg-slate-500',
           text_color: 'text-white'
         });
       });
     } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCurrentUser(null);
     }
   }, [session]);
@@ -122,56 +129,13 @@ export default function App() {
   // We only wait for auth session to decide between Login or App
   if (authLoading) return <LoadingScreen message="Vérification de l'identité..." />;
 
-  if (!session) {
-    console.log("[APP] Pas de session, direction Login.");
-    return <Login />;
-  }
-
-  // Public cahier des charges route
-  if (route.type === 'cahier') {
+  const handleCahierComplete = async () => {
     const client = clients.find(c => c.slug === route.slug);
-    const handleComplete = async (data) => {
-      if (client) {
-        await editClient(client.id, {
-          cahier_completed: true,
-          status: 'En Développement',
-        });
-      }
-    };
-    return (
-      <CahierDesCharges
-        clientSlug={route.slug}
-        clientName={client?.name || route.slug}
-        onComplete={handleComplete}
-      />
-    );
-  }
-
-  const handleReplayPrompt = (query) => {
-    setChatInitialMessage(query);
-    setChatOpen(true);
-    setActiveTab('AIChat');
-  };
-
-  const handleViewCahier = (client) => {
-    window.open(`/cahier/${client.slug}`, '_blank');
-  };
-
-  const handleNewClient = () => {
-    setActiveTab('Clients');
-  };
-
-  const handleChatMessageSent = async (message) => {
-    try {
-      await addAiLog({
-        query: message,
-        user_name: currentUser?.name || 'Ismael',
-        category: 'Chat',
-        status: 'Complété',
-        tokens: 0,
+    if (client) {
+      await editClient(client.id, {
+        cahier_completed: true,
+        status: 'En Développement',
       });
-    } catch (e) {
-      console.error('Failed to log AI message:', e);
     }
   };
 
@@ -190,6 +154,10 @@ export default function App() {
             onMoveLead={moveLead}
           />
         );
+      case 'Billing':
+        return <BillingView />;
+      case 'Portfolio':
+        return <ClientPortfolio onEditClient={editClient} onNewClient={handleNewClient} />;
       case 'Clients':
         return (
           <ClientsProjects
@@ -200,6 +168,7 @@ export default function App() {
             onDeleteClient={removeClient}
             onViewCahier={handleViewCahier}
             currentUser={currentUser}
+            onNewClient={handleNewClient}
           />
         );
       case 'Analytics':
@@ -224,6 +193,8 @@ export default function App() {
             onDeleteSop={removeSop}
           />
         );
+      case 'Tools':
+        return <Tools onAddLog={addAiLog} />;
       case 'Settings':
         return <Settings currentUser={currentUser} setCurrentUser={setCurrentUser} />;
       default:
@@ -232,37 +203,55 @@ export default function App() {
   };
 
   return (
-    <div className="flex h-screen bg-bg-dark text-white overflow-hidden">
-      <Sidebar
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
+    <ThemeProvider>
+      <AddClientModal
+        isOpen={isAddClientModalOpen}
+        onClose={() => setIsAddClientModalOpen(false)}
+        onAdd={addClient}
         currentUser={currentUser}
-        onLogout={() => db.signOut()}
       />
-
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <Header
-          onMenuClick={() => setSidebarOpen(true)}
-          onChatToggle={() => setChatOpen(prev => !prev)}
-          chatOpen={chatOpen}
-          activeTab={activeTab}
-          currentUser={currentUser}
+      {route.type === 'cahier' ? (
+        <CahierDesCharges
+          clientSlug={route.slug}
+          clientName={clients.find(c => c.slug === route.slug)?.name || route.slug}
+          onComplete={handleCahierComplete}
         />
+      ) : !session ? (
+        <Login />
+      ) : (
+        <div className="flex min-h-screen bg-white dark:bg-bg-dark text-slate-900 dark:text-white font-body transition-colors duration-300 overflow-x-hidden">
+          <Sidebar
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            isOpen={sidebarOpen}
+            onClose={() => setSidebarOpen(false)}
+            currentUser={currentUser}
+            onLogout={() => db.signOut()}
+          />
 
-        <main className="flex-1 overflow-y-auto p-5 md:p-8 custom-scrollbar">
-          {renderPage()}
-        </main>
-      </div>
+          <div className="flex-1 flex flex-col min-w-0">
+            <Header
+              onMenuClick={() => setSidebarOpen(true)}
+              onChatToggle={() => setChatOpen(prev => !prev)}
+              chatOpen={chatOpen}
+              activeTab={activeTab}
+              currentUser={currentUser}
+            />
 
-      <ChatPanel
-        isOpen={chatOpen}
-        onClose={() => setChatOpen(false)}
-        initialMessage={chatInitialMessage}
-        onMessageSent={handleChatMessageSent}
-        currentUser={currentUser}
-      />
-    </div>
+            <main className="flex-1 p-4 md:p-6 w-full max-w-full overflow-hidden">
+              {renderPage()}
+            </main>
+          </div>
+
+          <ChatPanel
+            isOpen={chatOpen}
+            onClose={() => setChatOpen(false)}
+            initialMessage={chatInitialMessage}
+            currentUser={currentUser}
+            onNavigate={setActiveTab}
+          />
+        </div>
+      )}
+    </ThemeProvider>
   );
 }

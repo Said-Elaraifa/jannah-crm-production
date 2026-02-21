@@ -1,11 +1,13 @@
-// src/components/chat/ChatPanel.jsx
 import { useState, useRef, useEffect } from 'react';
-import { Bot, Send, X, Copy, Check } from 'lucide-react';
+import { Bot, Send, X, Copy, Check, Settings, Play, XOctagon } from 'lucide-react';
 import { sendMessageToGemini } from '../../services/gemini';
+import { executeAiTool } from '../../services/ai_tools';
 
-function ChatMessage({ msg }) {
+function ChatMessage({ msg, onNavigate, onExecute, onCancel }) {
     const isBot = msg.sender === 'bot';
     const [copied, setCopied] = useState(false);
+
+    const isLeakedKeyError = msg.text.includes("Clé API partagée") && msg.text.includes("désactivée");
 
     const handleCopy = () => {
         navigator.clipboard.writeText(msg.text);
@@ -32,6 +34,33 @@ function ChatMessage({ msg }) {
                         </div>
                     )}
                     <p className="whitespace-pre-wrap">{msg.text}</p>
+
+                    {isBot && isLeakedKeyError && onNavigate && (
+                        <button
+                            onClick={() => onNavigate('Settings')}
+                            className="mt-3 w-full py-2 bg-accent/20 hover:bg-accent/30 text-accent text-xs font-bold rounded-xl transition-all border border-accent/20 flex items-center justify-center gap-2"
+                        >
+                            <Settings size={14} />
+                            Configurer ma clé API
+                        </button>
+                    )}
+
+                    {isBot && msg.functionCall && (
+                        <div className="mt-4 flex gap-2">
+                            <button
+                                onClick={() => onExecute && onExecute(msg.functionCall, msg.id)}
+                                className="flex-1 py-1.5 bg-green-500/20 hover:bg-green-500/30 text-green-400 text-xs font-bold rounded-xl transition-all border border-green-500/20 flex items-center justify-center gap-1.5"
+                            >
+                                <Play size={12} /> Confirmer
+                            </button>
+                            <button
+                                onClick={() => onCancel && onCancel(msg.id)}
+                                className="flex-1 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-500 text-xs font-bold rounded-xl transition-all border border-red-500/20 flex items-center justify-center gap-1.5"
+                            >
+                                <XOctagon size={12} /> Annuler
+                            </button>
+                        </div>
+                    )}
                 </div>
                 {isBot && (
                     <button
@@ -46,7 +75,7 @@ function ChatMessage({ msg }) {
     );
 }
 
-export default function ChatPanel({ isOpen, onClose, initialMessage, onMessageSent, currentUser }) {
+export default function ChatPanel({ isOpen, onClose, initialMessage, currentUser, onNavigate }) {
     const [messages, setMessages] = useState([]);
 
     useEffect(() => {
@@ -56,7 +85,7 @@ export default function ChatPanel({ isOpen, onClose, initialMessage, onMessageSe
                 { id: 'greeting', sender: 'bot', text: `Bonjour ${currentUser.name || '...'} ! 👋 Je suis votre assistant Jannah Intelligence. Je peux vous aider avec l'analyse de performance, la génération de contenu, les stratégies SEO, et bien plus. Comment puis-je vous aider aujourd'hui ?` }
             ]);
         }
-    }, [currentUser?.id, currentUser?.name, messages.length]);
+    }, [currentUser, messages.length]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const chatEndRef = useRef(null);
@@ -73,6 +102,34 @@ export default function ChatPanel({ isOpen, onClose, initialMessage, onMessageSe
         }
     }, [initialMessage, isOpen]);
 
+    const handleExecuteFunction = async (funcCall, messageId) => {
+        try {
+            setIsLoading(true);
+            // Hide buttons
+            setMessages(prev => prev.map(m => m.id === messageId ? { ...m, functionCall: null } : m));
+
+            await executeAiTool(funcCall.name, funcCall.args);
+
+            setMessages(prev => [...prev, {
+                id: Date.now(),
+                sender: 'bot',
+                text: "✅ L'action a été exécutée avec succès sur le CRM."
+            }]);
+        } catch (err) {
+            setMessages(prev => [...prev, {
+                id: Date.now(),
+                sender: 'bot',
+                text: `❌ Erreur lors de l'exécution : ${err.message}`
+            }]);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleCancelFunction = (messageId) => {
+        setMessages(prev => prev.map(m => m.id === messageId ? { ...m, functionCall: null, text: m.text + "\n\n*(Action annulée par l'utilisateur)*" } : m));
+    };
+
     const handleSend = async (e) => {
         e.preventDefault();
         if (!input.trim() || isLoading) return;
@@ -83,11 +140,18 @@ export default function ChatPanel({ isOpen, onClose, initialMessage, onMessageSe
         setInput('');
         setIsLoading(true);
 
-        if (onMessageSent) onMessageSent(currentInput);
-
         try {
             const response = await sendMessageToGemini(currentInput, messages, currentUser);
-            setMessages(prev => [...prev, { id: Date.now() + 1, sender: 'bot', text: response }]);
+            if (typeof response === 'object' && response.type === 'function_call') {
+                setMessages(prev => [...prev, {
+                    id: Date.now() + 1,
+                    sender: 'bot',
+                    text: response.text,
+                    functionCall: { name: response.name, args: response.args }
+                }]);
+            } else {
+                setMessages(prev => [...prev, { id: Date.now() + 1, sender: 'bot', text: response }]);
+            }
         } catch (error) {
             setMessages(prev => [...prev, {
                 id: Date.now() + 1,
@@ -133,7 +197,7 @@ export default function ChatPanel({ isOpen, onClose, initialMessage, onMessageSe
 
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
-                {messages.map(msg => <ChatMessage key={msg.id} msg={msg} />)}
+                {messages.map(msg => <ChatMessage key={msg.id} msg={msg} onNavigate={onNavigate} onExecute={handleExecuteFunction} onCancel={handleCancelFunction} />)}
 
                 {isLoading && (
                     <div className="flex justify-start mb-4">

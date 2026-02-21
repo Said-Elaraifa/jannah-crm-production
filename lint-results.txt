@@ -1,0 +1,586 @@
+
+> crm-jannah@0.0.0 lint
+> eslint .
+
+
+K:\Ads jannah\CRM Jannah\src\App.jsx
+    2:44  error  'useMemo' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           no-unused-vars
+   61:41  error  'clientsLoading' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           no-unused-vars
+   62:37  error  'leadsLoading' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             no-unused-vars
+   63:35  error  'sopsLoading' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              no-unused-vars
+   64:39  error  'aiLogsLoading' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            no-unused-vars
+   80:45  error  Compilation Skipped: Existing memoization could not be preserved
+
+React Compiler has skipped optimizing this component because the existing manual memoization could not be preserved. The inferred dependencies did not match the manually specified dependencies, which could cause the value to change more or less frequently than expected. The inferred dependency was `currentUser`, but the source dependencies were [addAiLog, currentUser?.name]. Inferred less specific property than source.
+
+  78 |   }, []);
+  79 |
+> 80 |   const handleChatMessageSent = useCallback(async (message) => {
+     |                                             ^^^^^^^^^^^^^^^^^^^^
+> 81 |     try {
+     | ^^^^^^^^^
+> 82 |       await addAiLog({
+     …
+     | ^^^^^^^^^
+> 91 |     }
+     | ^^^^^^^^^
+> 92 |   }, [addAiLog, currentUser?.name]);
+     | ^^^^ Could not preserve existing manual memoization
+  93 |
+  94 |   useEffect(() => {
+  95 |     // Check current session with timeout guard  react-hooks/preserve-manual-memoization
+  146:7   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  144 |       });
+  145 |     } else {
+> 146 |       setCurrentUser(null);
+      |       ^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  147 |     }
+  148 |   }, [session]);
+  149 |                                                                             react-hooks/set-state-in-effect
+  162:35  error  'data' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         no-unused-vars
+
+K:\Ads jannah\CRM Jannah\src\components\ErrorBoundary.jsx
+  10:37  error  'error' is defined but never used  no-unused-vars
+
+K:\Ads jannah\CRM Jannah\src\components\chat\ChatPanel.jsx
+  71:8  warning  React Hook useEffect has a missing dependency: 'currentUser'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+K:\Ads jannah\CRM Jannah\src\components\ui\index.jsx
+  168:36  error  'Icon' is defined but never used  no-unused-vars
+
+K:\Ads jannah\CRM Jannah\src\pages\AILogs.jsx
+  2:20  error  'useMemo' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+K:\Ads jannah\CRM Jannah\src\pages\Analytics.jsx
+   17:39  error  'Icon' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            no-unused-vars
+   32:57  error  'Icon' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            no-unused-vars
+   74:9   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  72 |         const targetCPA = (values.aov * values.margin) / 100;
+  73 |         const profitPerSale = values.aov - targetCPA; // Simplified
+> 74 |         setResults({
+     |         ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  75 |             breakEvenROAS: breakEvenROAS.toFixed(2),
+  76 |             targetCPA: targetCPA.toFixed(2),
+  77 |             profitPerSale: profitPerSale.toFixed(2)                                                                      react-hooks/set-state-in-effect
+  149:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  147 |             if (params.content) baseUrl.searchParams.set('utm_content', params.content.replace(/\s+/g, '_').toLowerCase());
+  148 |             if (params.term) baseUrl.searchParams.set('utm_term', params.term.replace(/\s+/g, '_').toLowerCase());
+> 149 |             setGeneratedUrl(baseUrl.toString());
+      |             ^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  150 |         } catch (e) {
+  151 |             setGeneratedUrl('');
+  152 |         }  react-hooks/set-state-in-effect
+  150:18  error  'e' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               no-unused-vars
+
+K:\Ads jannah\CRM Jannah\src\pages\ClientsProjects.jsx
+   34:47  error  'Icon' is defined but never used                                                         no-unused-vars
+   70:45  error  'Icon' is defined but never used                                                         no-unused-vars
+   80:43  error  'Icon' is defined but never used                                                         no-unused-vars
+  111:36  error  'Icon' is defined but never used                                                         no-unused-vars
+  417:12  error  'loading' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  640:42  error  'setClients' is defined but never used                                                   no-unused-vars
+  640:97  error  'onViewCahier' is defined but never used                                                 no-unused-vars
+
+K:\Ads jannah\CRM Jannah\src\pages\SalesPipeline.jsx
+   11:20  error  'getIntegrations' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           no-unused-vars
+  138:26  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+  136 |                 <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto max-h-[70vh] custom-scrollbar">
+  137 |                     <div className="grid grid-cols-2 gap-4">
+> 138 |                         <Field label="Entreprise *">
+      |                          ^^^^^ This component is created during render
+  139 |                             <input required value={form.company} onChange={e => setForm({ ...form, company: e.target.value })} className={inputCls} placeholder="Nom de l'entreprise" />
+  140 |                         </Field>
+  141 |                         <Field label="Contact *">
+
+  115 |     };
+  116 |
+> 117 |     const Field = ({ label, children }) => (
+      |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 118 |         <div>
+      | ^^^^^^^^^^^^^
+> 119 |             <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">{label}</label>
+      | ^^^^^^^^^^^^^
+> 120 |             {children}
+      | ^^^^^^^^^^^^^
+> 121 |         </div>
+      | ^^^^^^^^^^^^^
+> 122 |     );
+      | ^^^^^^ The component is created during render here
+  123 |
+  124 |     const inputCls = "w-full bg-bg-dark text-white text-sm rounded-xl px-4 py-2.5 border border-white/5 focus:border-primary outline-none transition-all placeholder-slate-600";
+  125 |                                                         react-hooks/static-components
+  141:26  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+  139 |                             <input required value={form.company} onChange={e => setForm({ ...form, company: e.target.value })} className={inputCls} placeholder="Nom de l'entreprise" />
+  140 |                         </Field>
+> 141 |                         <Field label="Contact *">
+      |                          ^^^^^ This component is created during render
+  142 |                             <input required value={form.contact} onChange={e => setForm({ ...form, contact: e.target.value })} className={inputCls} placeholder="Prénom Nom" />
+  143 |                         </Field>
+  144 |                     </div>
+
+  115 |     };
+  116 |
+> 117 |     const Field = ({ label, children }) => (
+      |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 118 |         <div>
+      | ^^^^^^^^^^^^^
+> 119 |             <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">{label}</label>
+      | ^^^^^^^^^^^^^
+> 120 |             {children}
+      | ^^^^^^^^^^^^^
+> 121 |         </div>
+      | ^^^^^^^^^^^^^
+> 122 |     );
+      | ^^^^^^ The component is created during render here
+  123 |
+  124 |     const inputCls = "w-full bg-bg-dark text-white text-sm rounded-xl px-4 py-2.5 border border-white/5 focus:border-primary outline-none transition-all placeholder-slate-600";
+  125 |                                                      react-hooks/static-components
+  148:26  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+  146 |                     {/* Pro Sales Fields */}
+  147 |                     <div className="grid grid-cols-3 gap-4 bg-white/5 p-4 rounded-xl border border-white/5">
+> 148 |                         <Field label="Valeur (€)">
+      |                          ^^^^^ This component is created during render
+  149 |                             <input type="number" value={form.value} onChange={e => setForm({ ...form, value: e.target.value })} className={`${inputCls} font-bold text-accent`} placeholder="2500" />
+  150 |                         </Field>
+  151 |                         <Field label="Probabilité (%)">
+
+  115 |     };
+  116 |
+> 117 |     const Field = ({ label, children }) => (
+      |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 118 |         <div>
+      | ^^^^^^^^^^^^^
+> 119 |             <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">{label}</label>
+      | ^^^^^^^^^^^^^
+> 120 |             {children}
+      | ^^^^^^^^^^^^^
+> 121 |         </div>
+      | ^^^^^^^^^^^^^
+> 122 |     );
+      | ^^^^^^ The component is created during render here
+  123 |
+  124 |     const inputCls = "w-full bg-bg-dark text-white text-sm rounded-xl px-4 py-2.5 border border-white/5 focus:border-primary outline-none transition-all placeholder-slate-600";
+  125 |                                                                  react-hooks/static-components
+  151:26  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+  149 |                             <input type="number" value={form.value} onChange={e => setForm({ ...form, value: e.target.value })} className={`${inputCls} font-bold text-accent`} placeholder="2500" />
+  150 |                         </Field>
+> 151 |                         <Field label="Probabilité (%)">
+      |                          ^^^^^ This component is created during render
+  152 |                             <input type="number" min="0" max="100" value={form.probability} onChange={e => setForm({ ...form, probability: e.target.value })} className={inputCls} />
+  153 |                         </Field>
+  154 |                         <Field label="Score (0-100)">
+
+  115 |     };
+  116 |
+> 117 |     const Field = ({ label, children }) => (
+      |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 118 |         <div>
+      | ^^^^^^^^^^^^^
+> 119 |             <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">{label}</label>
+      | ^^^^^^^^^^^^^
+> 120 |             {children}
+      | ^^^^^^^^^^^^^
+> 121 |         </div>
+      | ^^^^^^^^^^^^^
+> 122 |     );
+      | ^^^^^^ The component is created during render here
+  123 |
+  124 |     const inputCls = "w-full bg-bg-dark text-white text-sm rounded-xl px-4 py-2.5 border border-white/5 focus:border-primary outline-none transition-all placeholder-slate-600";
+  125 |  react-hooks/static-components
+  154:26  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+  152 |                             <input type="number" min="0" max="100" value={form.probability} onChange={e => setForm({ ...form, probability: e.target.value })} className={inputCls} />
+  153 |                         </Field>
+> 154 |                         <Field label="Score (0-100)">
+      |                          ^^^^^ This component is created during render
+  155 |                             <input type="number" min="0" max="100" value={form.score} onChange={e => setForm({ ...form, score: e.target.value })} className={inputCls} />
+  156 |                         </Field>
+  157 |                     </div>
+
+  115 |     };
+  116 |
+> 117 |     const Field = ({ label, children }) => (
+      |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 118 |         <div>
+      | ^^^^^^^^^^^^^
+> 119 |             <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">{label}</label>
+      | ^^^^^^^^^^^^^
+> 120 |             {children}
+      | ^^^^^^^^^^^^^
+> 121 |         </div>
+      | ^^^^^^^^^^^^^
+> 122 |     );
+      | ^^^^^^ The component is created during render here
+  123 |
+  124 |     const inputCls = "w-full bg-bg-dark text-white text-sm rounded-xl px-4 py-2.5 border border-white/5 focus:border-primary outline-none transition-all placeholder-slate-600";
+  125 |                                                           react-hooks/static-components
+  160:26  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+  158 |
+  159 |                     <div className="grid grid-cols-2 gap-4">
+> 160 |                         <Field label="Prochaine Étape">
+      |                          ^^^^^ This component is created during render
+  161 |                             <input value={form.next_step} onChange={e => setForm({ ...form, next_step: e.target.value })} className={inputCls} placeholder="Ex: Relance J+3" />
+  162 |                         </Field>
+  163 |                         <Field label="Dernier Contact">
+
+  115 |     };
+  116 |
+> 117 |     const Field = ({ label, children }) => (
+      |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 118 |         <div>
+      | ^^^^^^^^^^^^^
+> 119 |             <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">{label}</label>
+      | ^^^^^^^^^^^^^
+> 120 |             {children}
+      | ^^^^^^^^^^^^^
+> 121 |         </div>
+      | ^^^^^^^^^^^^^
+> 122 |     );
+      | ^^^^^^ The component is created during render here
+  123 |
+  124 |     const inputCls = "w-full bg-bg-dark text-white text-sm rounded-xl px-4 py-2.5 border border-white/5 focus:border-primary outline-none transition-all placeholder-slate-600";
+  125 |                                                                                                                                                                                react-hooks/static-components
+  163:26  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+  161 |                             <input value={form.next_step} onChange={e => setForm({ ...form, next_step: e.target.value })} className={inputCls} placeholder="Ex: Relance J+3" />
+  162 |                         </Field>
+> 163 |                         <Field label="Dernier Contact">
+      |                          ^^^^^ This component is created during render
+  164 |                             <input type="date" value={form.last_contact} onChange={e => setForm({ ...form, last_contact: e.target.value })} className={inputCls} />
+  165 |                         </Field>
+  166 |                     </div>
+
+  115 |     };
+  116 |
+> 117 |     const Field = ({ label, children }) => (
+      |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 118 |         <div>
+      | ^^^^^^^^^^^^^
+> 119 |             <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">{label}</label>
+      | ^^^^^^^^^^^^^
+> 120 |             {children}
+      | ^^^^^^^^^^^^^
+> 121 |         </div>
+      | ^^^^^^^^^^^^^
+> 122 |     );
+      | ^^^^^^ The component is created during render here
+  123 |
+  124 |     const inputCls = "w-full bg-bg-dark text-white text-sm rounded-xl px-4 py-2.5 border border-white/5 focus:border-primary outline-none transition-all placeholder-slate-600";
+  125 |                                                                     react-hooks/static-components
+  169:26  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+  167 |
+  168 |                     <div className="grid grid-cols-2 gap-4">
+> 169 |                         <Field label="Email">
+      |                          ^^^^^ This component is created during render
+  170 |                             <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} className={inputCls} placeholder="email@exemple.fr" />
+  171 |                         </Field>
+  172 |                         <Field label="Téléphone">
+
+  115 |     };
+  116 |
+> 117 |     const Field = ({ label, children }) => (
+      |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 118 |         <div>
+      | ^^^^^^^^^^^^^
+> 119 |             <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">{label}</label>
+      | ^^^^^^^^^^^^^
+> 120 |             {children}
+      | ^^^^^^^^^^^^^
+> 121 |         </div>
+      | ^^^^^^^^^^^^^
+> 122 |     );
+      | ^^^^^^ The component is created during render here
+  123 |
+  124 |     const inputCls = "w-full bg-bg-dark text-white text-sm rounded-xl px-4 py-2.5 border border-white/5 focus:border-primary outline-none transition-all placeholder-slate-600";
+  125 |                                                                                                                                                                                          react-hooks/static-components
+  172:26  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+  170 |                             <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} className={inputCls} placeholder="email@exemple.fr" />
+  171 |                         </Field>
+> 172 |                         <Field label="Téléphone">
+      |                          ^^^^^ This component is created during render
+  173 |                             <input value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} className={inputCls} placeholder="+33:6..." />
+  174 |                         </Field>
+  175 |                     </div>
+
+  115 |     };
+  116 |
+> 117 |     const Field = ({ label, children }) => (
+      |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 118 |         <div>
+      | ^^^^^^^^^^^^^
+> 119 |             <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">{label}</label>
+      | ^^^^^^^^^^^^^
+> 120 |             {children}
+      | ^^^^^^^^^^^^^
+> 121 |         </div>
+      | ^^^^^^^^^^^^^
+> 122 |     );
+      | ^^^^^^ The component is created during render here
+  123 |
+  124 |     const inputCls = "w-full bg-bg-dark text-white text-sm rounded-xl px-4 py-2.5 border border-white/5 focus:border-primary outline-none transition-all placeholder-slate-600";
+  125 |                                                                        react-hooks/static-components
+  178:26  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+  176 |
+  177 |                     <div className="grid grid-cols-2 gap-4">
+> 178 |                         <Field label="Étape">
+      |                          ^^^^^ This component is created during render
+  179 |                             <select value={form.stage} onChange={e => setForm({ ...form, stage: e.target.value })} className={inputCls + " cursor-pointer"}>
+  180 |                                 {STAGES.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
+  181 |                             </select>
+
+  115 |     };
+  116 |
+> 117 |     const Field = ({ label, children }) => (
+      |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 118 |         <div>
+      | ^^^^^^^^^^^^^
+> 119 |             <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">{label}</label>
+      | ^^^^^^^^^^^^^
+> 120 |             {children}
+      | ^^^^^^^^^^^^^
+> 121 |         </div>
+      | ^^^^^^^^^^^^^
+> 122 |     );
+      | ^^^^^^ The component is created during render here
+  123 |
+  124 |     const inputCls = "w-full bg-bg-dark text-white text-sm rounded-xl px-4 py-2.5 border border-white/5 focus:border-primary outline-none transition-all placeholder-slate-600";
+  125 |                                                                                                                                                          react-hooks/static-components
+  183:26  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+  181 |                             </select>
+  182 |                         </Field>
+> 183 |                         <Field label="Source">
+      |                          ^^^^^ This component is created during render
+  184 |                             <select value={form.source} onChange={e => setForm({ ...form, source: e.target.value })} className={inputCls + " cursor-pointer"}>
+  185 |                                 {SOURCES.map(s => <option key={s} value={s}>{s}</option>)}
+  186 |                             </select>
+
+  115 |     };
+  116 |
+> 117 |     const Field = ({ label, children }) => (
+      |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 118 |         <div>
+      | ^^^^^^^^^^^^^
+> 119 |             <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">{label}</label>
+      | ^^^^^^^^^^^^^
+> 120 |             {children}
+      | ^^^^^^^^^^^^^
+> 121 |         </div>
+      | ^^^^^^^^^^^^^
+> 122 |     );
+      | ^^^^^^ The component is created during render here
+  123 |
+  124 |     const inputCls = "w-full bg-bg-dark text-white text-sm rounded-xl px-4 py-2.5 border border-white/5 focus:border-primary outline-none transition-all placeholder-slate-600";
+  125 |                                                                                                                                                        react-hooks/static-components
+  190:22  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+  188 |                     </div>
+  189 |
+> 190 |                     <Field label="Assigné à">
+      |                      ^^^^^ This component is created during render
+  191 |                         <select value={form.assigned_to} onChange={e => setForm({ ...form, assigned_to: e.target.value })} className={inputCls + " cursor-pointer"}>
+  192 |                             {TEAM_MEMBERS.map(m => <option key={m.id} value={m.name}>{m.name} ({m.role})</option>)}
+  193 |                         </select>
+
+  115 |     };
+  116 |
+> 117 |     const Field = ({ label, children }) => (
+      |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 118 |         <div>
+      | ^^^^^^^^^^^^^
+> 119 |             <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">{label}</label>
+      | ^^^^^^^^^^^^^
+> 120 |             {children}
+      | ^^^^^^^^^^^^^
+> 121 |         </div>
+      | ^^^^^^^^^^^^^
+> 122 |     );
+      | ^^^^^^ The component is created during render here
+  123 |
+  124 |     const inputCls = "w-full bg-bg-dark text-white text-sm rounded-xl px-4 py-2.5 border border-white/5 focus:border-primary outline-none transition-all placeholder-slate-600";
+  125 |                                                                                                                                                                              react-hooks/static-components
+  196:22  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+  194 |                     </Field>
+  195 |
+> 196 |                     <Field label="Notes">
+      |                      ^^^^^ This component is created during render
+  197 |                         <textarea value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} rows={3}
+  198 |                             className={inputCls + " resize-none"} placeholder="Informations complémentaires..." />
+  199 |                     </Field>
+
+  115 |     };
+  116 |
+> 117 |     const Field = ({ label, children }) => (
+      |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 118 |         <div>
+      | ^^^^^^^^^^^^^
+> 119 |             <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">{label}</label>
+      | ^^^^^^^^^^^^^
+> 120 |             {children}
+      | ^^^^^^^^^^^^^
+> 121 |         </div>
+      | ^^^^^^^^^^^^^
+> 122 |     );
+      | ^^^^^^ The component is created during render here
+  123 |
+  124 |     const inputCls = "w-full bg-bg-dark text-white text-sm rounded-xl px-4 py-2.5 border border-white/5 focus:border-primary outline-none transition-all placeholder-slate-600";
+  125 |                                                                                                                                                                                                                                 react-hooks/static-components
+  213:43  error  'onDelete' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             no-unused-vars
+  325:12  error  'auditOpen' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        no-unused-vars
+  326:12  error  'auditLead' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        no-unused-vars
+  327:12  error  'auditResult' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      no-unused-vars
+  328:12  error  'auditLoading' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     no-unused-vars
+  401:19  error  'updatedLeads' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     no-unused-vars
+
+K:\Ads jannah\CRM Jannah\src\pages\Settings.jsx
+  186:26  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  184 |
+  185 |     useEffect(() => {
+> 186 |         if (integration) setForm(integration.config || {});
+      |                          ^^^^^^^ Avoid calling setState() directly within an effect
+  187 |     }, [integration]);
+  188 |
+  189 |     if (!isOpen || !integration) return null;                                                                                                                             react-hooks/set-state-in-effect
+  231:12  error  'selected' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          no-unused-vars
+  231:22  error  'setSelected' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       no-unused-vars
+  381:9   error  Error: Cannot access variable before it is declared
+
+`fetchTeam` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  379 |     // Initial Fetch
+  380 |     useEffect(() => {
+> 381 |         fetchTeam();
+      |         ^^^^^^^^^ `fetchTeam` accessed before it is declared
+  382 |         fetchIntegrations();
+  383 |     }, []);
+  384 |
+
+  392 |     };
+  393 |
+> 394 |     const fetchTeam = async () => {
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 395 |         try {
+      | ^^^^^^^^^^^^^
+> 396 |             const data = await getTeamMembers();
+      | ^^^^^^^^^^^^^
+> 397 |             setTeam(data);
+      | ^^^^^^^^^^^^^
+> 398 |         } catch (err) {
+      | ^^^^^^^^^^^^^
+> 399 |             console.error('Error fetching team:', err);
+      | ^^^^^^^^^^^^^
+> 400 |         }
+      | ^^^^^^^^^^^^^
+> 401 |     };
+      | ^^^^^^^ `fetchTeam` is declared here
+  402 |
+  403 |     const handleUploadImage = async (e) => {
+  404 |         const file = e.target.files[0];                                                            react-hooks/immutability
+  382:9   error  Error: Cannot access variable before it is declared
+
+`fetchIntegrations` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  380 |     useEffect(() => {
+  381 |         fetchTeam();
+> 382 |         fetchIntegrations();
+      |         ^^^^^^^^^^^^^^^^^ `fetchIntegrations` accessed before it is declared
+  383 |     }, []);
+  384 |
+  385 |     const fetchIntegrations = async () => {
+
+  383 |     }, []);
+  384 |
+> 385 |     const fetchIntegrations = async () => {
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 386 |         try {
+      | ^^^^^^^^^^^^^
+> 387 |             const data = await getIntegrations();
+      | ^^^^^^^^^^^^^
+> 388 |             setIntegrations(data);
+      | ^^^^^^^^^^^^^
+> 389 |         } catch (err) {
+      | ^^^^^^^^^^^^^
+> 390 |             console.error('Error fetching integrations:', err);
+      | ^^^^^^^^^^^^^
+> 391 |         }
+      | ^^^^^^^^^^^^^
+> 392 |     };
+      | ^^^^^^^ `fetchIntegrations` is declared here
+  393 |
+  394 |     const fetchTeam = async () => {
+  395 |         try {  react-hooks/immutability
+  450:19  error  'Puzzle' is not defined                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           no-undef
+
+K:\Ads jannah\CRM Jannah\src\pages\Tools.jsx
+   1:20  error  'useCallback' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+   1:33  error  'useMemo' is defined but never used. Allowed unused vars must match /^[A-Z_]/u      no-unused-vars
+  11:52  error  'Icon' is defined but never used                                                    no-unused-vars
+
+K:\Ads jannah\CRM Jannah\src\utils\pdfExport.js
+  7:34  error  'reject' is defined but never used  no-unused-vars
+
+✖ 54 problems (53 errors, 1 warning)
+

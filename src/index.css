@@ -1,3 +1,4 @@
+/* Configuration Tailwind V4 réinjectée et validée par Jannah AI */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
@@ -6,32 +7,61 @@
    ============================================ */
 @theme {
   /* Colors */
-  --color-primary: #056d47;
-  --color-secondary: #c3dc7f;
-  --color-accent: #eeb417;
-  --color-bg-dark: #12202c;
-  --color-surface-dark: #1c3144;
-  --color-surface-darker: #152636;
-  --color-surface-mid: #274059;
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  --color-bg-dark: var(--bg-main);
+  --color-surface-dark: var(--surface-main);
+  --color-surface-darker: var(--surface-alt);
+  --color-surface-mid: var(--surface-mid);
 
   /* Fonts */
   --font-display: "Poppins", sans-serif;
   --font-body: "Montserrat", sans-serif;
 }
 
+:root {
+  /* Light Mode (Fallback/Default) */
+  --primary: #056d47;
+  --secondary: #8ca650;
+  --accent: #eeb417;
+  /* Keeps the jannah gold */
+  --bg-main: #f0f4f8;
+  --surface-main: #ffffff;
+  --surface-alt: #f8fafc;
+  --surface-mid: #e2e8f0;
+}
+
+:root.dark,
+.dark {
+  /* Dark Mode (Original) */
+  --primary: #056d47;
+  --secondary: #c3dc7f;
+  --accent: #eeb417;
+  --bg-main: #12202c;
+  --surface-main: #1c3144;
+  --surface-alt: #152636;
+  --surface-mid: #274059;
+}
+
 /* ============================================
    BASE STYLES
    ============================================ */
 html {
-  color-scheme: dark;
+  /* Automatically managed color scheme */
 }
 
 body {
-  background-color: var(--color-bg-dark);
-  color: #f1f5f9;
+  background-color: var(--bg-main);
+  color: var(--color-surface-darker);
+  /* Fallback */
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.dark body {
+  color: #f1f5f9;
 }
 
 * {
@@ -168,4 +198,48 @@ select,
 
 .animate-scale-in {
   animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ============================================
+   PRINT STYLES (A4 PDF EXPORT)
+   ============================================ */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+
+  /* Force background colors and images to print */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body {
+    background-color: white !important;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Hide the root app container */
+  #root {
+    display: none !important;
+  }
+
+  /* Make sure our print area is visible and spans the exact A4 dimensions */
+  #print-area {
+    display: block !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 210mm !important;
+    min-height: 297mm !important;
+    padding: 20mm !important;
+    margin: 0 auto;
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+    z-index: 999999 !important;
+    page-break-after: avoid;
+  }
 }

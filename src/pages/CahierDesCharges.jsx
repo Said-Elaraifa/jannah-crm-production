@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { CheckCircle, ChevronRight, ChevronLeft, SkipForward, Upload, Palette, Globe, Zap, Users, FileText, Check, Loader2, ExternalLink } from 'lucide-react';
 import { saveCahier, uploadFile } from '../services/supabase';
 import { JannahLogoWithBadge } from '../components/ui/JannahLogo';
+import { CustomSelect } from '../components/ui/CustomSelect';
 
 const STEPS = [
     { id: 1, title: "Votre Entreprise", icon: Users, description: "Parlez-nous de vous" },
@@ -28,12 +29,12 @@ function StepIndicator({ currentStep, totalSteps }) {
                 <div key={step} className="flex items-center">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${step < currentStep ? 'bg-secondary text-primary' :
                         step === currentStep ? 'bg-primary text-white ring-4 ring-primary/20' :
-                            'bg-white/5 text-slate-500'
+                            'bg-slate-100 dark:bg-white/10 text-slate-400 dark:text-slate-500'
                         }`}>
                         {step < currentStep ? <Check size={14} /> : step}
                     </div>
                     {step < totalSteps && (
-                        <div className={`w-8 h-0.5 mx-1 transition-all duration-300 ${step < currentStep ? 'bg-secondary' : 'bg-white/10'}`} />
+                        <div className={`w-8 h-0.5 mx-1 transition-all duration-300 ${step < currentStep ? 'bg-secondary' : 'bg-slate-200 dark:bg-white/10'}`} />
                     )}
                 </div>
             ))}
@@ -43,7 +44,7 @@ function StepIndicator({ currentStep, totalSteps }) {
 
 function SkipButton({ onSkip }) {
     return (
-        <button onClick={onSkip} className="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-300 transition-colors">
+        <button onClick={onSkip} className="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-900 dark:hover:text-slate-300 transition-colors">
             <SkipForward size={12} /> Passer cette étape
         </button>
     );
@@ -51,9 +52,9 @@ function SkipButton({ onSkip }) {
 
 function FeatureCheckbox({ feature, checked, onChange }) {
     return (
-        <label className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${checked ? 'bg-primary/10 border-primary/40 text-white' : 'bg-white/3 border-white/5 text-slate-400 hover:border-white/20'
+        <label className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${checked ? 'bg-primary/10 border-primary/40 text-slate-900 dark:text-white' : 'bg-slate-50 dark:bg-white/3 border-slate-200 dark:border-white/5 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-white/20'
             }`}>
-            <div className={`w-4 h-4 rounded flex items-center justify-center flex-shrink-0 transition-all ${checked ? 'bg-primary' : 'bg-white/5 border border-white/10'
+            <div className={`w-4 h-4 rounded flex items-center justify-center flex-shrink-0 transition-all ${checked ? 'bg-primary' : 'bg-slate-200 dark:bg-white/5 border border-slate-300 dark:border-white/10'
                 }`}>
                 {checked && <Check size={10} className="text-white" />}
             </div>
@@ -76,7 +77,7 @@ function FileUploadZone({ label, accept, onFile, file, uploading }) {
 
     return (
         <div>
-            <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">{label}</label>
+            <label className="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">{label}</label>
             <div
                 onClick={() => !uploading && inputRef.current.click()}
                 onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
@@ -85,7 +86,7 @@ function FileUploadZone({ label, accept, onFile, file, uploading }) {
                 className={`relative flex flex-col items-center justify-center gap-2 p-5 rounded-xl border-2 border-dashed transition-all ${uploading ? 'border-primary/30 bg-primary/5 cursor-wait' :
                     file ? 'border-primary/50 bg-primary/5 cursor-pointer' :
                         dragOver ? 'border-secondary/50 bg-secondary/5 cursor-copy' :
-                            'border-white/10 hover:border-white/20 bg-white/2 cursor-pointer'
+                            'border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 bg-slate-50 dark:bg-white/2 cursor-pointer'
                     }`}
             >
                 <input ref={inputRef} type="file" accept={accept} className="hidden" onChange={e => e.target.files[0] && onFile(e.target.files[0])} />
@@ -104,11 +105,11 @@ function FileUploadZone({ label, accept, onFile, file, uploading }) {
                     </>
                 ) : (
                     <>
-                        <div className="w-8 h-8 bg-white/5 rounded-lg flex items-center justify-center">
-                            <Upload size={16} className="text-slate-400" />
+                        <div className="w-8 h-8 bg-slate-200 dark:bg-white/5 rounded-lg flex items-center justify-center">
+                            <Upload size={16} className="text-slate-500 dark:text-slate-400" />
                         </div>
-                        <p className="text-xs text-slate-400">Glisser-déposer ou <span className="text-secondary">parcourir</span></p>
-                        <p className="text-[10px] text-slate-600">{accept.replace(/\./g, '').toUpperCase().replace(/,/g, ', ')}</p>
+                        <p className="text-xs text-slate-600 dark:text-slate-400">Glisser-déposer ou <span className="text-secondary">parcourir</span></p>
+                        <p className="text-[10px] text-slate-400 dark:text-slate-600">{accept.replace(/\./g, '').toUpperCase().replace(/,/g, ', ')}</p>
                     </>
                 )}
             </div>
@@ -214,28 +215,28 @@ export default function CahierDesCharges({ clientSlug, clientName, onComplete })
 
     if (isCompleted) {
         return (
-            <div className="min-h-screen bg-bg-dark flex items-center justify-center p-4">
+            <div className="min-h-screen bg-white dark:bg-bg-dark flex items-center justify-center p-4 transition-colors duration-300">
                 <div className="max-w-md w-full text-center animate-fade-in-up">
                     <div className="w-20 h-20 bg-secondary/20 rounded-full flex items-center justify-center mx-auto mb-6">
                         <CheckCircle size={40} className="text-secondary" />
                     </div>
-                    <h2 className="text-2xl font-display font-bold text-white mb-3">Merci !</h2>
-                    <p className="text-slate-400 mb-6">
+                    <h2 className="text-2xl font-display font-bold text-slate-900 dark:text-white mb-3">Merci !</h2>
+                    <p className="text-slate-600 dark:text-slate-400 mb-6">
                         Votre cahier des charges a bien été reçu. L'équipe Jannah Agency va l'analyser et vous contacter très prochainement.
                     </p>
-                    <div className="bg-surface-dark rounded-2xl p-5 border border-white/5 text-left">
-                        <p className="text-xs text-slate-500 uppercase tracking-wider mb-3">Récapitulatif</p>
+                    <div className="bg-slate-50 dark:bg-surface-dark rounded-2xl p-5 border border-slate-200 dark:border-white/5 text-left">
+                        <p className="text-xs text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3">Récapitulatif</p>
                         <div className="space-y-2 text-sm">
-                            <div className="flex justify-between"><span className="text-slate-500">Entreprise</span><span className="text-white font-semibold">{formData.companyName}</span></div>
-                            <div className="flex justify-between"><span className="text-slate-500">Projet</span><span className="text-white font-semibold">{formData.projectType || '—'}</span></div>
-                            <div className="flex justify-between"><span className="text-slate-500">Style</span><span className="text-white font-semibold">{formData.style || '—'}</span></div>
-                            <div className="flex justify-between"><span className="text-slate-500">Fonctionnalités</span><span className="text-white font-semibold">{formData.features.length} sélectionnées</span></div>
-                            {logoUrl && <div className="flex justify-between items-center"><span className="text-slate-500">Logo</span><a href={logoUrl} target="_blank" rel="noreferrer" className="text-secondary text-xs flex items-center gap-1 hover:underline">Voir <ExternalLink size={10} /></a></div>}
-                            {charteUrl && <div className="flex justify-between items-center"><span className="text-slate-500">Charte</span><a href={charteUrl} target="_blank" rel="noreferrer" className="text-secondary text-xs flex items-center gap-1 hover:underline">Voir <ExternalLink size={10} /></a></div>}
+                            <div className="flex justify-between"><span className="text-slate-500">Entreprise</span><span className="text-slate-900 dark:text-white font-semibold">{formData.companyName}</span></div>
+                            <div className="flex justify-between"><span className="text-slate-500">Projet</span><span className="text-slate-900 dark:text-white font-semibold">{formData.projectType || '—'}</span></div>
+                            <div className="flex justify-between"><span className="text-slate-500">Style</span><span className="text-slate-900 dark:text-white font-semibold">{formData.style || '—'}</span></div>
+                            <div className="flex justify-between"><span className="text-slate-500">Fonctionnalités</span><span className="text-slate-900 dark:text-white font-semibold">{formData.features.length} sélectionnées</span></div>
+                            {logoUrl && <div className="flex justify-between items-center"><span className="text-slate-500">Logo</span><a href={logoUrl} target="_blank" rel="noreferrer" className="text-secondary text-xs flex items-center gap-1 hover:underline font-bold">Voir <ExternalLink size={10} /></a></div>}
+                            {charteUrl && <div className="flex justify-between items-center"><span className="text-slate-500">Charte</span><a href={charteUrl} target="_blank" rel="noreferrer" className="text-secondary text-xs flex items-center gap-1 hover:underline font-bold">Voir <ExternalLink size={10} /></a></div>}
                         </div>
                     </div>
                     <div className="mt-6 p-4 bg-primary/10 border border-primary/20 rounded-xl">
-                        <p className="text-xs text-secondary font-semibold">📧 Nous vous contacterons sous 24-48h</p>
+                        <p className="text-xs text-secondary font-bold">📧 Nous vous contacterons sous 24-48h</p>
                     </div>
                 </div>
             </div>
@@ -246,13 +247,13 @@ export default function CahierDesCharges({ clientSlug, clientName, onComplete })
     const StepIcon = currentStepData.icon;
 
     return (
-        <div className="min-h-screen bg-bg-dark flex flex-col">
+        <div className="min-h-screen bg-white dark:bg-bg-dark flex flex-col transition-colors duration-300">
             {/* Header */}
-            <div className="bg-[#152636] border-b border-white/5 px-6 py-4 flex items-center justify-between">
+            <div className="bg-slate-900 dark:bg-[#0f172a] border-b border-white/5 px-6 py-4 flex items-center justify-between transition-colors duration-300">
                 <JannahLogoWithBadge height={30} badge="Cahier des Charges" />
                 {clientName && (
-                    <div className="text-xs text-slate-500">
-                        Pour : <span className="text-white font-semibold">{clientName}</span>
+                    <div className="text-xs text-slate-400">
+                        Pour : <span className="text-white font-black">{clientName}</span>
                     </div>
                 )}
             </div>
@@ -264,41 +265,42 @@ export default function CahierDesCharges({ clientSlug, clientName, onComplete })
 
                     {/* Step Header */}
                     <div className="text-center mb-8">
-                        <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-primary/5">
                             <StepIcon size={22} className="text-secondary" />
                         </div>
-                        <h2 className="text-xl font-display font-bold text-white">{currentStepData.title}</h2>
-                        <p className="text-slate-400 text-sm mt-1">{currentStepData.description}</p>
+                        <h2 className="text-2xl font-display font-black text-slate-900 dark:text-white uppercase tracking-tight">{currentStepData.title}</h2>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm font-medium mt-2">{currentStepData.description}</p>
                     </div>
 
-                    {/* Step Content */}
-                    <div className="bg-surface-dark rounded-2xl border border-white/5 p-6 mb-6 space-y-5">
+                    {/* Step Content Card */}
+                    <div className="bg-white dark:bg-surface-dark rounded-3xl border border-slate-200 dark:border-white/5 p-8 mb-6 space-y-6 shadow-[0_8px_32px_rgba(0,0,0,0.05)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)] relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl pointer-events-none rounded-full" />
 
                         {/* Step 1: Company */}
                         {currentStep === 1 && (
                             <>
                                 <div>
-                                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Nom de votre entreprise</label>
+                                    <label className="block text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Nom de votre entreprise</label>
                                     <input value={formData.companyName} onChange={e => update('companyName', e.target.value)}
-                                        className="w-full bg-bg-dark text-white text-sm rounded-xl px-4 py-3 border border-white/5 focus:border-primary outline-none transition-all placeholder-slate-600"
+                                        className="w-full bg-slate-50 dark:bg-bg-dark text-slate-900 dark:text-white text-sm font-medium rounded-xl px-4 py-4 border border-slate-200 dark:border-white/5 focus:border-primary outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
                                         placeholder="Ex: Boulangerie Martin" />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Secteur d'activité</label>
+                                    <label className="block text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Secteur d'activité</label>
                                     <input value={formData.activity} onChange={e => update('activity', e.target.value)}
-                                        className="w-full bg-bg-dark text-white text-sm rounded-xl px-4 py-3 border border-white/5 focus:border-primary outline-none transition-all placeholder-slate-600"
+                                        className="w-full bg-slate-50 dark:bg-bg-dark text-slate-900 dark:text-white text-sm font-medium rounded-xl px-4 py-4 border border-slate-200 dark:border-white/5 focus:border-primary outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
                                         placeholder="Ex: Restauration, Santé, Commerce..." />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Votre clientèle cible</label>
+                                    <label className="block text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Votre clientèle cible</label>
                                     <textarea value={formData.targetAudience} onChange={e => update('targetAudience', e.target.value)} rows={2}
-                                        className="w-full bg-bg-dark text-white text-sm rounded-xl px-4 py-3 border border-white/5 focus:border-primary outline-none transition-all resize-none placeholder-slate-600"
+                                        className="w-full bg-slate-50 dark:bg-bg-dark text-slate-900 dark:text-white text-sm font-medium rounded-xl px-4 py-4 border border-slate-200 dark:border-white/5 focus:border-primary outline-none transition-all resize-none placeholder:text-slate-400 dark:placeholder:text-slate-600"
                                         placeholder="Ex: Familles locales, Professionnels 30-50 ans..." />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Sites concurrents (optionnel)</label>
+                                    <label className="block text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Sites concurrents (optionnel)</label>
                                     <input value={formData.competitors} onChange={e => update('competitors', e.target.value)}
-                                        className="w-full bg-bg-dark text-white text-sm rounded-xl px-4 py-3 border border-white/5 focus:border-primary outline-none transition-all placeholder-slate-600"
+                                        className="w-full bg-slate-50 dark:bg-bg-dark text-slate-900 dark:text-white text-sm font-medium rounded-xl px-4 py-4 border border-slate-200 dark:border-white/5 focus:border-primary outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
                                         placeholder="Ex: concurrent1.fr, concurrent2.com" />
                                 </div>
                             </>
@@ -308,11 +310,11 @@ export default function CahierDesCharges({ clientSlug, clientName, onComplete })
                         {currentStep === 2 && (
                             <>
                                 <div>
-                                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Type de projet</label>
+                                    <label className="block text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3">Type de projet</label>
                                     <div className="grid grid-cols-2 gap-2">
                                         {PROJECT_TYPES.map(type => (
                                             <button key={type} onClick={() => update('projectType', type)}
-                                                className={`p-3 rounded-xl border text-sm font-medium transition-all text-left ${formData.projectType === type ? 'bg-primary/10 border-primary/40 text-white' : 'bg-white/3 border-white/5 text-slate-400 hover:border-white/20'
+                                                className={`p-4 rounded-xl border text-sm font-bold transition-all text-left ${formData.projectType === type ? 'bg-primary/10 border-primary/40 text-primary' : 'bg-slate-50 dark:bg-white/3 border-slate-200 dark:border-white/5 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-white/20'
                                                     }`}>
                                                 {type}
                                             </button>
@@ -320,34 +322,42 @@ export default function CahierDesCharges({ clientSlug, clientName, onComplete })
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Objectif principal du site</label>
+                                    <label className="block text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Objectif principal du site</label>
                                     <textarea value={formData.projectGoal} onChange={e => update('projectGoal', e.target.value)} rows={3}
-                                        className="w-full bg-bg-dark text-white text-sm rounded-xl px-4 py-3 border border-white/5 focus:border-primary outline-none transition-all resize-none placeholder-slate-600"
+                                        className="w-full bg-slate-50 dark:bg-bg-dark text-slate-900 dark:text-white text-sm font-medium rounded-xl px-4 py-4 border border-slate-200 dark:border-white/5 focus:border-primary outline-none transition-all resize-none placeholder:text-slate-400 dark:placeholder:text-slate-600"
                                         placeholder="Ex: Attirer de nouveaux clients, vendre mes produits en ligne..." />
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Budget mensuel</label>
-                                        <select value={formData.budget} onChange={e => update('budget', e.target.value)}
-                                            className="w-full bg-bg-dark text-white text-sm rounded-xl px-4 py-3 border border-white/5 focus:border-primary outline-none cursor-pointer">
-                                            <option value="">Sélectionner...</option>
-                                            <option>Mini (79€/mo)</option>
-                                            <option>Standard (149€/mo)</option>
-                                            <option>Pro (299€/mo)</option>
-                                            <option>Sur mesure</option>
-                                        </select>
+                                        <label className="block text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Budget mensuel</label>
+                                        <CustomSelect
+                                            value={formData.budget}
+                                            onChange={val => update('budget', val)}
+                                            options={[
+                                                { value: '', label: 'Sélectionner...' },
+                                                { value: 'Mini (79€/mo)', label: 'Mini (79€/mo)' },
+                                                { value: 'Standard (149€/mo)', label: 'Standard (149€/mo)' },
+                                                { value: 'Pro (299€/mo)', label: 'Pro (299€/mo)' },
+                                                { value: 'Sur mesure', label: 'Sur mesure' }
+                                            ]}
+                                            className="w-full !bg-slate-50 dark:!bg-bg-dark text-slate-900 dark:text-white text-sm font-medium !border-slate-200 dark:!border-white/5"
+                                        />
                                     </div>
                                     <div>
-                                        <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Délai souhaité</label>
-                                        <select value={formData.deadline} onChange={e => update('deadline', e.target.value)}
-                                            className="w-full bg-bg-dark text-white text-sm rounded-xl px-4 py-3 border border-white/5 focus:border-primary outline-none cursor-pointer">
-                                            <option value="">Sélectionner...</option>
-                                            <option>1 semaine</option>
-                                            <option>2 semaines</option>
-                                            <option>1 mois</option>
-                                            <option>2-3 mois</option>
-                                            <option>Pas de contrainte</option>
-                                        </select>
+                                        <label className="block text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Délai souhaité</label>
+                                        <CustomSelect
+                                            value={formData.deadline}
+                                            onChange={val => update('deadline', val)}
+                                            options={[
+                                                { value: '', label: 'Sélectionner...' },
+                                                { value: '1 semaine', label: '1 semaine' },
+                                                { value: '2 semaines', label: '2 semaines' },
+                                                { value: '1 mois', label: '1 mois' },
+                                                { value: '2-3 mois', label: '2-3 mois' },
+                                                { value: 'Pas de contrainte', label: 'Pas de contrainte' }
+                                            ]}
+                                            className="w-full !bg-slate-50 dark:!bg-bg-dark text-slate-900 dark:text-white text-sm font-medium !border-slate-200 dark:!border-white/5"
+                                        />
                                     </div>
                                 </div>
                             </>
@@ -357,11 +367,11 @@ export default function CahierDesCharges({ clientSlug, clientName, onComplete })
                         {currentStep === 3 && (
                             <>
                                 <div>
-                                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Style visuel souhaité</label>
+                                    <label className="block text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3">Style visuel souhaité</label>
                                     <div className="grid grid-cols-2 gap-2">
                                         {STYLE_OPTIONS.map(style => (
                                             <button key={style} onClick={() => update('style', style)}
-                                                className={`p-3 rounded-xl border text-sm font-medium transition-all text-left ${formData.style === style ? 'bg-primary/10 border-primary/40 text-white' : 'bg-white/3 border-white/5 text-slate-400 hover:border-white/20'
+                                                className={`p-4 rounded-xl border text-sm font-bold transition-all text-left ${formData.style === style ? 'bg-primary/10 border-primary/40 text-primary' : 'bg-slate-50 dark:bg-white/3 border-slate-200 dark:border-white/5 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-white/20'
                                                     }`}>
                                                 {style}
                                             </button>
@@ -369,13 +379,13 @@ export default function CahierDesCharges({ clientSlug, clientName, onComplete })
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Couleurs de votre marque (optionnel)</label>
+                                    <label className="block text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Couleurs de votre marque (optionnel)</label>
                                     <input value={formData.colors} onChange={e => update('colors', e.target.value)}
-                                        className="w-full bg-bg-dark text-white text-sm rounded-xl px-4 py-3 border border-white/5 focus:border-primary outline-none transition-all placeholder-slate-600"
+                                        className="w-full bg-slate-50 dark:bg-bg-dark text-slate-900 dark:text-white text-sm font-medium rounded-xl px-4 py-4 border border-slate-200 dark:border-white/5 focus:border-primary outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
                                         placeholder="Ex: Bleu marine, Or, Blanc - ou codes hex: #1a2b3c" />
                                 </div>
-                                <div className="space-y-3">
-                                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Ressources visuelles</p>
+                                <div className="space-y-4">
+                                    <p className="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Ressources visuelles</p>
                                     <FileUploadZone
                                         label="Logo (PNG, JPG, SVG, WebP)"
                                         accept=".png,.jpg,.jpeg,.svg,.webp"
@@ -392,9 +402,9 @@ export default function CahierDesCharges({ clientSlug, clientName, onComplete })
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Sites qui vous inspirent (optionnel)</label>
+                                    <label className="block text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Sites qui vous inspirent (optionnel)</label>
                                     <textarea value={formData.inspirationUrls} onChange={e => update('inspirationUrls', e.target.value)} rows={2}
-                                        className="w-full bg-bg-dark text-white text-sm rounded-xl px-4 py-3 border border-white/5 focus:border-primary outline-none transition-all resize-none placeholder-slate-600"
+                                        className="w-full bg-slate-50 dark:bg-bg-dark text-slate-900 dark:text-white text-sm font-medium rounded-xl px-4 py-4 border border-slate-200 dark:border-white/5 focus:border-primary outline-none transition-all resize-none placeholder:text-slate-400 dark:placeholder:text-slate-600"
                                         placeholder="Ex: apple.com, airbnb.com..." />
                                 </div>
                             </>
@@ -404,8 +414,8 @@ export default function CahierDesCharges({ clientSlug, clientName, onComplete })
                         {currentStep === 4 && (
                             <>
                                 <div>
-                                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Fonctionnalités souhaitées</label>
-                                    <div className="grid grid-cols-1 gap-2">
+                                    <label className="block text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-4">Fonctionnalités souhaitées</label>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                         {FEATURE_OPTIONS.map(feature => (
                                             <FeatureCheckbox
                                                 key={feature}
@@ -417,9 +427,9 @@ export default function CahierDesCharges({ clientSlug, clientName, onComplete })
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Autres fonctionnalités (optionnel)</label>
+                                    <label className="block text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Autres fonctionnalités (optionnel)</label>
                                     <textarea value={formData.additionalFeatures} onChange={e => update('additionalFeatures', e.target.value)} rows={2}
-                                        className="w-full bg-bg-dark text-white text-sm rounded-xl px-4 py-3 border border-white/5 focus:border-primary outline-none transition-all resize-none placeholder-slate-600"
+                                        className="w-full bg-slate-50 dark:bg-bg-dark text-slate-900 dark:text-white text-sm font-medium rounded-xl px-4 py-4 border border-slate-200 dark:border-white/5 focus:border-primary outline-none transition-all resize-none placeholder:text-slate-400 dark:placeholder:text-slate-600"
                                         placeholder="Décrivez toute autre fonctionnalité spécifique..." />
                                 </div>
                             </>
@@ -428,20 +438,20 @@ export default function CahierDesCharges({ clientSlug, clientName, onComplete })
                         {/* Step 5: Content & Files */}
                         {currentStep === 5 && (
                             <>
-                                <div className="space-y-3">
-                                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Contenu disponible</label>
+                                <div className="space-y-4">
+                                    <label className="block text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Contenu disponible</label>
                                     {[
                                         { key: 'hasContent', label: 'J\'ai les textes prêts (descriptions, pages...)' },
                                         { key: 'hasImages', label: 'J\'ai des photos/images de qualité' },
                                     ].map(item => (
-                                        <label key={item.key} className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${formData[item.key] ? 'bg-primary/10 border-primary/40 text-white' : 'bg-white/3 border-white/5 text-slate-400 hover:border-white/20'
+                                        <label key={item.key} className={`flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all ${formData[item.key] ? 'bg-primary/10 border-primary/40 text-primary' : 'bg-slate-50 dark:bg-white/3 border-slate-200 dark:border-white/5 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-white/20'
                                             }`}>
-                                            <div className={`w-4 h-4 rounded flex items-center justify-center flex-shrink-0 transition-all ${formData[item.key] ? 'bg-primary' : 'bg-white/5 border border-white/10'
+                                            <div className={`w-4 h-4 rounded flex items-center justify-center flex-shrink-0 transition-all ${formData[item.key] ? 'bg-primary' : 'bg-slate-200 dark:bg-white/5 border border-slate-300 dark:border-white/10'
                                                 }`}>
                                                 {formData[item.key] && <Check size={10} className="text-white" />}
                                             </div>
                                             <input type="checkbox" className="hidden" checked={formData[item.key]} onChange={e => update(item.key, e.target.checked)} />
-                                            <span className="text-sm">{item.label}</span>
+                                            <span className="text-sm font-bold">{item.label}</span>
                                         </label>
                                     ))}
                                 </div>
@@ -455,21 +465,21 @@ export default function CahierDesCharges({ clientSlug, clientName, onComplete })
                                 />
 
                                 <div>
-                                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Informations complémentaires</label>
+                                    <label className="block text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Informations complémentaires</label>
                                     <textarea value={formData.additionalInfo} onChange={e => update('additionalInfo', e.target.value)} rows={4}
-                                        className="w-full bg-bg-dark text-white text-sm rounded-xl px-4 py-3 border border-white/5 focus:border-primary outline-none transition-all resize-none placeholder-slate-600"
+                                        className="w-full bg-slate-50 dark:bg-bg-dark text-slate-900 dark:text-white text-sm font-medium rounded-xl px-4 py-4 border border-slate-200 dark:border-white/5 focus:border-primary outline-none transition-all resize-none placeholder:text-slate-400 dark:placeholder:text-slate-600"
                                         placeholder="Tout ce qui pourrait nous aider à mieux comprendre votre projet..." />
                                 </div>
 
                                 {submitError && (
-                                    <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
-                                        <p className="text-xs text-red-400">{submitError}</p>
+                                    <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl">
+                                        <p className="text-xs text-red-500 font-bold">{submitError}</p>
                                     </div>
                                 )}
 
-                                <div className="bg-primary/5 border border-primary/20 rounded-xl p-4">
-                                    <p className="text-xs text-slate-400">
-                                        🎉 Vous avez presque terminé ! Cliquez sur "Envoyer" pour transmettre votre cahier des charges à l'équipe Jannah Agency.
+                                <div className="bg-primary/5 border border-primary/20 rounded-xl p-5">
+                                    <p className="text-xs text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
+                                        🎉 Vous avez presque terminé ! Cliquez sur <strong className="text-primary uppercase">"Envoyer"</strong> pour transmettre votre cahier des charges à l'équipe Jannah Agency.
                                     </p>
                                 </div>
                             </>
@@ -480,7 +490,7 @@ export default function CahierDesCharges({ clientSlug, clientName, onComplete })
                     <div className="flex items-center justify-between">
                         <div>
                             {currentStep > 1 ? (
-                                <button onClick={prevStep} className="flex items-center gap-2 px-4 py-2.5 bg-white/5 hover:bg-white/10 text-slate-300 text-sm font-medium rounded-xl transition-all">
+                                <button onClick={prevStep} className="flex items-center gap-2 px-6 py-3 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-600 dark:text-slate-300 text-sm font-bold rounded-xl transition-all active:scale-95 border border-slate-200 dark:border-white/10">
                                     <ChevronLeft size={16} /> Retour
                                 </button>
                             ) : <div />}

@@ -1,10 +1,11 @@
 // src/pages/AILogs.jsx
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import {
     Play, Trash2, Plus, Bot, X, Search, Copy,
     Zap, Bookmark, Tag, LayoutGrid, Clock, ChevronRight, PenTool
 } from 'lucide-react';
 import { INITIAL_AI_LOGS, PROMPT_LIBRARY } from '../data/constants';
+import { CustomSelect } from '../components/ui/CustomSelect';
 
 // --- Helper: Variable Extraction ---
 const extractVariables = (text) => {
@@ -70,13 +71,12 @@ function AddTemplateModal({ isOpen, onClose, onAdd }) {
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Catégorie</label>
-                            <select
+                            <CustomSelect
                                 value={form.category}
-                                onChange={e => setForm({ ...form, category: e.target.value })}
-                                className="w-full bg-bg-dark text-white text-sm rounded-xl px-4 py-2.5 border border-white/5 focus:border-primary outline-none cursor-pointer"
-                            >
-                                {['Personal', 'Work', 'Creative', 'Dev', 'Marketing'].map(c => <option key={c}>{c}</option>)}
-                            </select>
+                                onChange={val => setForm({ ...form, category: val })}
+                                options={['Personal', 'Work', 'Creative', 'Dev', 'Marketing'].map(c => ({ value: c, label: c }))}
+                                className="text-white"
+                            />
                         </div>
                         <div>
                             <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Tags (séparés par virgules)</label>
@@ -220,7 +220,7 @@ function PromptLibrary({ prompts, onUsePrompt }) {
                 onRun={onUsePrompt}
             />
 
-            <div className="flex items-center bg-surface-dark rounded-xl px-4 py-3 border border-white/5 focus-within:border-primary/50 transition-all">
+            <div className="flex items-center bg-surface-dark rounded-xl px-4 py-2.5 border border-white/5 focus-within:border-primary/50 transition-all">
                 <Search size={18} className="text-slate-500 mr-3 flex-shrink-0" />
                 <input
                     type="text"
@@ -233,14 +233,14 @@ function PromptLibrary({ prompts, onUsePrompt }) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-fade-in-up">
                 {filtered.map(p => (
-                    <div key={p.id} className="bg-surface-dark p-5 rounded-2xl border border-white/5 hover:border-primary/30 transition-all group flex flex-col h-full">
-                        <div className="flex justify-between items-start mb-3">
-                            <span className="text-[10px] font-bold px-2 py-1 rounded-lg bg-white/5 text-slate-400 uppercase tracking-wider">{p.category}</span>
-                            <div className="flex items-center gap-1 text-slate-500 text-xs">
-                                <Bookmark size={12} /> {p.likes}
+                    <div key={p.id} className="bg-surface-dark p-4 rounded-xl border border-white/5 hover:border-primary/30 transition-all group flex flex-col h-full">
+                        <div className="flex justify-between items-start mb-2.5">
+                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-lg bg-white/5 text-slate-400 uppercase tracking-widest">{p.category}</span>
+                            <div className="flex items-center gap-1 text-slate-500 text-[10px]">
+                                <Bookmark size={10} /> {p.likes}
                             </div>
                         </div>
-                        <h4 className="font-bold text-white text-base mb-2 group-hover:text-primary transition-colors">{p.title}</h4>
+                        <h4 className="font-bold text-white text-sm mb-1.5 group-hover:text-primary transition-colors">{p.title}</h4>
                         <div className="flex flex-wrap gap-2 mb-4">
                             {p.tags.map(t => (
                                 <span key={t} className="text-[10px] text-slate-400 bg-black/20 px-1.5 py-0.5 rounded border border-white/5">#{t}</span>
@@ -266,7 +266,7 @@ function HistoryLogs({ logs, onDelete, onReplay }) {
     if (logs.length === 0) return <div className="text-center text-slate-500 py-10">Aucun historique.</div>;
 
     return (
-        <div className="bg-surface-dark rounded-2xl border border-white/5 overflow-hidden animate-fade-in-up">
+        <div className="bg-surface-dark rounded-2xl border border-white/5 overflow-hidden overflow-x-auto custom-scrollbar animate-fade-in-up">
             <table className="w-full text-sm">
                 <thead className="bg-bg-dark/50 border-b border-white/5">
                     <tr className="text-left">
@@ -329,13 +329,13 @@ export default function AILogs({ logs, setLogs, onReplay }) {
     };
 
     return (
-        <div className="space-y-8 pb-10">
+        <div className="space-y-5 pb-10">
             <AddTemplateModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} onAdd={handleAddTemplate} />
 
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h2 className="text-3xl font-display font-bold text-white">Bibliothèque IA</h2>
-                    <p className="text-slate-400 mt-1">Prompt Engineering & Historique des commandes.</p>
+                    <h2 className="text-2xl font-display font-bold text-white">Bibliothèque IA</h2>
+                    <p className="text-xs text-slate-400 mt-1">Prompt Engineering & Historique des commandes.</p>
                 </div>
 
                 <div className="flex items-center gap-3">

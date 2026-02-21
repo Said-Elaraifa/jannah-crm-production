@@ -1,0 +1,96 @@
+
+> crm-jannah@0.0.0 lint
+> eslint .
+
+
+K:\Ads jannah\CRM Jannah\src\components\chat\ChatPanel.jsx
+  71:8  warning  React Hook useEffect has a missing dependency: 'currentUser'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+K:\Ads jannah\CRM Jannah\src\components\ui\index.jsx
+  168:36  error  'Icon' is defined but never used  no-unused-vars
+
+K:\Ads jannah\CRM Jannah\src\pages\AILogs.jsx
+  2:20  error  'useMemo' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+K:\Ads jannah\CRM Jannah\src\pages\Analytics.jsx
+  155:13  warning  Unused eslint-disable directive (no problems were reported from 'react-hooks/set-state-in-effect')
+
+K:\Ads jannah\CRM Jannah\src\pages\Settings.jsx
+  381:9  error  Error: Cannot access variable before it is declared
+
+`fetchTeam` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  379 |     // Initial Fetch
+  380 |     useEffect(() => {
+> 381 |         fetchTeam();
+      |         ^^^^^^^^^ `fetchTeam` accessed before it is declared
+  382 |         fetchIntegrations();
+  383 |     }, []);
+  384 |
+
+  392 |     };
+  393 |
+> 394 |     async function fetchTeam() {
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 395 |         try {
+      | ^^^^^^^^^^^^^
+> 396 |             const data = await getTeamMembers();
+      | ^^^^^^^^^^^^^
+> 397 |             setTeam(data);
+      | ^^^^^^^^^^^^^
+> 398 |         } catch (err) {
+      | ^^^^^^^^^^^^^
+> 399 |             console.error('Error fetching team:', err);
+      | ^^^^^^^^^^^^^
+> 400 |         }
+      | ^^^^^^^^^^^^^
+> 401 |     };
+      | ^^^^^^ `fetchTeam` is declared here
+  402 |
+  403 |     const handleUploadImage = async (e) => {
+  404 |         const file = e.target.files[0];                                                      react-hooks/immutability
+  382:9  error  Error: Cannot access variable before it is declared
+
+`fetchIntegrations` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+  380 |     useEffect(() => {
+  381 |         fetchTeam();
+> 382 |         fetchIntegrations();
+      |         ^^^^^^^^^^^^^^^^^ `fetchIntegrations` accessed before it is declared
+  383 |     }, []);
+  384 |
+  385 |     async function fetchIntegrations() {
+
+  383 |     }, []);
+  384 |
+> 385 |     async function fetchIntegrations() {
+      |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 386 |         try {
+      | ^^^^^^^^^^^^^
+> 387 |             const data = await getIntegrations();
+      | ^^^^^^^^^^^^^
+> 388 |             setIntegrations(data);
+      | ^^^^^^^^^^^^^
+> 389 |         } catch (err) {
+      | ^^^^^^^^^^^^^
+> 390 |             console.error('Error fetching integrations:', err);
+      | ^^^^^^^^^^^^^
+> 391 |         }
+      | ^^^^^^^^^^^^^
+> 392 |     };
+      | ^^^^^^ `fetchIntegrations` is declared here
+  393 |
+  394 |     async function fetchTeam() {
+  395 |         try {  react-hooks/immutability
+
+K:\Ads jannah\CRM Jannah\src\pages\Tools.jsx
+   1:20  error  'useCallback' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+   1:33  error  'useMemo' is defined but never used. Allowed unused vars must match /^[A-Z_]/u      no-unused-vars
+  11:52  error  'Icon' is defined but never used                                                    no-unused-vars
+
+K:\Ads jannah\CRM Jannah\src\utils\pdfExport.js
+  7:34  error  'reject' is defined but never used  no-unused-vars
+
+✖ 10 problems (8 errors, 2 warnings)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+

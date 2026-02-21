@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import * as db from '../services/supabase';
 
 export function useSops() {
@@ -19,22 +19,29 @@ export function useSops() {
 
     useEffect(() => { load(); }, [load]);
 
-    const addSop = async (sop) => {
+    const addSop = useCallback(async (sop) => {
         const newSop = await db.addSopRecord(sop);
         setSops(prev => [newSop, ...prev]);
         return newSop;
-    };
+    }, []);
 
-    const editSop = async (id, updates) => {
+    const editSop = useCallback(async (id, updates) => {
         const updated = await db.updateSopRecord(id, updates);
         setSops(prev => prev.map(s => s.id === id ? updated : s));
         return updated;
-    };
+    }, []);
 
-    const removeSop = async (id) => {
+    const removeSop = useCallback(async (id) => {
         await db.removeSopRecord(id);
         setSops(prev => prev.filter(s => s.id !== id));
-    };
+    }, []);
 
-    return { sops, setSops, loading, addSop, editSop, removeSop };
+    return useMemo(() => ({
+        sops,
+        setSops,
+        loading,
+        addSop,
+        editSop,
+        removeSop
+    }), [sops, loading, addSop, editSop, removeSop]);
 }

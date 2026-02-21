@@ -1,7 +1,7 @@
 // src/data/constants.js
 // Global constants and initial data for Jannah CRM
 
-export const GEMINI_API_KEY = "AIzaSyAdHArjAtR4ca86-7EE1r5hEz1ZghheUxw";
+export const GEMINI_API_KEY = ""; // Stockée de manière sécurisée dans la base de données.
 
 // Role Definitions
 export const ROLES = {
@@ -12,9 +12,10 @@ export const ROLES = {
 };
 
 export const TEAM_MEMBERS = [
-    { id: 1, name: "Ismael", role: "CEO", roleId: 'admin', initial: "I", color: "bg-accent", textColor: "text-[#12202c]", access: "Admin", email: "ismael@jannah.co", status: "Active" },
-    { id: 2, name: "Said", role: "COO / Dev", roleId: 'tech', initial: "S", color: "bg-blue-500", textColor: "text-white", access: "Tech", email: "said@jannah.co", status: "Active" },
-    { id: 3, name: "Ghassen", role: "Sales", roleId: 'sales', initial: "G", color: "bg-secondary", textColor: "text-primary", access: "Sales", email: "ghassen@jannah.co", status: "Active" },
+    { id: 1, name: "Ismael", role: "CEO", roleId: 'admin', initial: "I", color: "bg-accent", textColor: "text-[#12202c]", access: "Admin", email: "ismael@jannah.co", status: "Active", avatar: "https://i.pravatar.cc/150?u=ismael" },
+    { id: 2, name: "Jessy", role: "COO / Directeur Adjoint", roleId: 'admin', initial: "J", color: "bg-purple-500", textColor: "text-white", access: "Admin", email: "jessy@jannah.co", status: "Active", avatar: "https://i.pravatar.cc/150?u=jessy" },
+    { id: 3, name: "Said", role: "Lead Dev", roleId: 'tech', initial: "S", color: "bg-blue-500", textColor: "text-white", access: "Tech", email: "said@jannah.co", status: "Active", avatar: "https://i.pravatar.cc/150?u=said" },
+    { id: 4, name: "Ghassen", role: "Sales Pur", roleId: 'sales', initial: "G", color: "bg-secondary", textColor: "text-primary", access: "Sales", email: "ghassen@jannah.co", status: "Active", avatar: "https://i.pravatar.cc/150?u=ghassen" },
 ];
 
 export const MOCK_CURRENT_USER = TEAM_MEMBERS[0]; // Default to Ismael
@@ -53,10 +54,10 @@ export const ADS_CAMPAIGNS_LIST = [
 ];
 
 export const INITIAL_PIPELINE = [
-    { id: 'l1', company: "Garage V. Auto", contact: "Vincent M.", value: 1500, stage: 'new', score: 45, source: "Google Ads", email: "vincent@garage.fr", phone: "+33 6 12 34 56 78", notes: "Intéressé par site vitrine", assignedTo: "Gassene", createdAt: "2024-11-10" },
-    { id: 'l2', company: "Boulangerie Pâtisserie", contact: "Marie L.", value: 3000, stage: 'qualified', score: 85, source: "SEO", email: "marie@boulangerie.fr", phone: "+33 6 98 76 54 32", notes: "Besoin urgent refonte site", assignedTo: "Gassene", createdAt: "2024-11-08" },
+    { id: 'l1', company: "Garage V. Auto", contact: "Vincent M.", value: 1500, stage: 'new', score: 45, source: "Google Ads", email: "vincent@garage.fr", phone: "+33 6 12 34 56 78", notes: "Intéressé par site vitrine", assignedTo: "Ghassen", createdAt: "2024-11-10" },
+    { id: 'l2', company: "Boulangerie Pâtisserie", contact: "Marie L.", value: 3000, stage: 'qualified', score: 85, source: "SEO", email: "marie@boulangerie.fr", phone: "+33 6 98 76 54 32", notes: "Besoin urgent refonte site", assignedTo: "Ghassen", createdAt: "2024-11-08" },
     { id: 'l3', company: "Startup TechFlow", contact: "Karim B.", value: 12000, stage: 'proposal', score: 92, source: "LinkedIn", email: "karim@techflow.io", phone: "+33 6 55 44 33 22", notes: "Projet e-commerce + SEO", assignedTo: "Ismael", createdAt: "2024-11-05" },
-    { id: 'l4', company: "Cabinet Juridique Moreau", contact: "Sophie M.", value: 2500, stage: 'won', score: 98, source: "Référence", email: "s.moreau@cabinet.fr", phone: "+33 6 11 22 33 44", notes: "Contrat signé - onboarding en cours", assignedTo: "Gassene", createdAt: "2024-10-28" },
+    { id: 'l4', company: "Cabinet Juridique Moreau", contact: "Sophie M.", value: 2500, stage: 'won', score: 98, source: "Référence", email: "s.moreau@cabinet.fr", phone: "+33 6 11 22 33 44", notes: "Contrat signé - onboarding en cours", assignedTo: "Ghassen", createdAt: "2024-10-28" },
 ];
 
 export const INITIAL_CLIENTS = [
@@ -70,6 +71,8 @@ export const INITIAL_CLIENTS = [
         plan: "Standard (149€/mo)",
         lastUpdate: "Hier",
         statusColor: "text-blue-400 bg-blue-400/10",
+        healthScore: "green", // Vert, Jaune, Rouge
+        invoices: [{ id: "INV-001", amount: 149, status: "paid" }],
         cahierDesChargesCompleted: false,
         cahierDesChargesData: null,
         lovablePrompt: null,
@@ -88,6 +91,8 @@ export const INITIAL_CLIENTS = [
         plan: "Mini (79€/mo)",
         lastUpdate: "3j",
         statusColor: "text-secondary bg-secondary/10",
+        healthScore: "green",
+        invoices: [{ id: "INV-002", amount: 79, status: "paid" }],
         cahierDesChargesCompleted: true,
         cahierDesChargesData: {
             companyName: "Pizzeria Napoli",
@@ -112,54 +117,36 @@ export const INITIAL_CLIENTS = [
 export const INITIAL_SOPS = [
     {
         id: 1,
-        title: "Onboarding Nouveau Client (V2.0 Automated)",
-        category: "Sales",
-        type: "Checklist",
-        lastUpdated: "12 Oct 2024",
-        author: "Ghassen",
-        content: "### Phase 1 : Pré-Kickoff\n1. [ ] Envoyer email de bienvenue (Template #ONB-01)\n2. [ ] Créer dossier Drive partagé + Slack channel\n3. [ ] Envoyer questionnaire de pré-qualification technique\n\n### Phase 2 : Kickoff Call (45 min)\n1. [ ] Présentation de l'équipe dédiée\n2. [ ] Review des objectifs KPI (SMART)\n3. [ ] Validation du planning prévisionnel\n\n### Phase 3 : Setup\n1. [ ] Accès Analytics & Ads Manager récupérés\n2. [ ] Audit technique initial lancé (Screaming Frog)\n3. [ ] Premier rapport à J+7"
+        title: "Guide d'Utilisation : Rôle CEO / Admin",
+        category: "Management",
+        type: "Guide",
+        lastUpdated: "Aujourd'hui",
+        author: "Système",
+        content: "### 📊 Vision Globale (Dashboard CEO)\n- **Surveiller le MRR** : Le Dashboard affiche en temps réel les revenus récurrents et la santé financière.\n- **Suivi des KPIs** : Vérifiez le volume total de clients, le taux d'attrition (Churn) et l'acquisition de nouveaux leads.\n- **Activité de l'Agence** : Le flux d'activité en direct permet de voir les actions clés (nouveaux contrats, tickets, etc.).\n\n### ⚙️ Gestion du Système (Paramètres)\n- **Accès et Membres** : Dans *Paramètres > Équipe*, vous pouvez ajouter de nouveaux collaborateurs et définir leurs rôles.\n- **Intégrations** : Gérez les clés API (Gemini, Supabase) et les connexions (Stripe, Slack) pour l'OS."
     },
     {
         id: 2,
-        title: "Protocole de Gestion de Crise (Site Down)",
-        category: "Tech",
+        title: "Guide d'Utilisation : Rôle Sales / Closer",
+        category: "Sales",
         type: "Guide",
-        lastUpdated: "Hier",
-        author: "Said",
-        content: "### 🚨 URGENT : SITE CLIENT INACCESSIBLE\n\n**Étape 1 : Diagnostic Rapide (5 min)**\n- Vérifier statut hébergeur (Vercel Status, AWS Health)\n- Tester DNS (whatsmydns.net)\n- Vérifier déploiement récent (GitHub Actions)\n\n**Étape 2 : Communication Client**\n- Envoyer message type : 'Nous avons détecté une anomalie, équipe sur le coup.' (Ne pas promettre de délai avant diag complet)\n\n**Étape 3 : Résolution**\n- Si erreur 500 : Consulter logs serveur\n- Si erreur DNS : Contacter registrar\n- Si attaque DDoS : Activer Cloudflare Under Attack Mode\n\n**Post-Mortem**\n- Rédiger rapport d'incident sous 24h."
+        lastUpdated: "Aujourd'hui",
+        author: "Système",
+        content: "### 🎯 Gestion du Sales Pipeline\n- **Vue Kanban** : Organisez vos leads par étapes (Nouveau, Qualifié, Proposition, Gagné). Glissez-déposez les cartes.\n- **Ajout de Leads** : Cliquez sur *NOUVEAU DEAL* pour entrer les informations du prospect, la source et la valeur.\n- **Audit Stratégique IA** : Utilisez le bouton IA sur la carte d'un lead pour obtenir une analyse du prospect et des axes de négociation.\n\n### 💰 Devis et Conversion\n- **Création de Devis** : Dans *Ventes & Finances*, générez des devis professionnels.\n- **Conversion** : Une fois le deal 'Gagné', convertissez-le dans le *Portefeuille Clients* pour l'onboarding."
     },
     {
         id: 3,
-        title: "Script de Closing High-Ticket (>5k€)",
-        category: "Sales",
-        type: "Document",
-        lastUpdated: "05 Nov 2024",
-        author: "Ismael",
-        content: "**Philosophie** : Ne vendez pas, diagnostiquez.\n\n### 1. Le Cadre (The Frame)\n'Le but de cet appel est de voir si nous sommes un bon fit. Si oui, on avance. Si non, je vous recommanderai quelqu'un d'autre. Ça vous va ?'\n\n### 2. Douleur (Pain)\n'Pourquoi chercher une agence maintenant ? Qu'est-ce qui coûte de l'argent actuellement dans votre setup ?'\n\n### 3. Le Coût de l'Inaction\n'Si vous ne changez rien, où en sera votre CA dans 6 mois ?'\n\n### 4. La Solution (Le Pont)\n'D'après ce que vous me dites, vous avez besoin de X et Y. C'est exactement ce qu'on a fait pour [Client Similaire].'\n\n### 5. Closing\n'Voulez-vous qu'on règle ce problème ensemble ?'"
-    },
-    {
-        id: 4,
-        title: "Routine Hebdomadaire Account Manager",
-        category: "Marketing",
-        type: "Checklist",
-        lastUpdated: "01 Nov 2024",
-        author: "Ismael",
-        content: "### Lundi : Audit & Planif\n- [ ] Review des dépenses Ads vs Budget Pacing\n- [ ] Check des KPIs (CPL, ROAS) vs S-1\n- [ ] Email hebdo 'Semaine à venir' aux clients focus\n\n### Mercredi : Optimisation\n- [ ] Kill des ads sous-performantes (< 1.5 ROAS)\n- [ ] Scale des winners (+20% budget)\n- [ ] Relance créas graphiste si fatigue publicitaire\n\n### Vendredi : Reporting\n- [ ] Préparation des Looms de fin de semaine\n- [ ] Mise à jour du CRM (Statuts, Notes)\n- [ ] Cleanup inbox"
-    },
-    {
-        id: 5,
-        title: "Récupération Compte Publicitaire Banni",
-        category: "Marketing",
+        title: "Guide d'Utilisation : Account Manager / Ops",
+        category: "Opérations",
         type: "Guide",
         lastUpdated: "Aujourd'hui",
-        author: "Ghassen",
-        content: "### Cas 1 : Suspicion d'Activité Inhabituelle\n- Action : Vérifier méthode de paiement (nom CB = nom Admin)\n- Appel : Contacter support via Chat Pro (pas le formulaire auto)\n\n### Cas 2 : Violation de Policy (Contournement)\n- **Ne jamais admettre la faute directement**\n- Script : 'Nous pensons qu'il s'agit d'une erreur de l'IA. Notre landing page respecte les règles X et Y.'\n- Toujours demander une *Human Review*.\n\n### Plan B : Business Manager de Secours\n- Toujours avoir un BM 'Warm' prêt à prendre le relais (voir Process #BM-BACKUP)."
+        author: "Système",
+        content: "### 🗂️ Portefeuille Clients\n- **Vue d'Ensemble** : Filtrez et suivez les projets (Tous, En Progrès, Live).\n- **Health Score** :\n  - 🟢 **Vert** : Le projet avance bien, client satisfait.\n  - 🟡 **Jaune** : Attention requise (retards, attentes).\n  - 🔴 **Rouge** : Risque élevé (blocage majeur). Agir immédiatement.\n- **Mise à jour** : Modifiez le statut, le Health Score et l'avancement (%) du projet sur la carte client.\n\n### 💬 Communication\n- **Inbox Omnicanale** : (Si activé) centralisez les retours clients.\n- **Cahier des Charges** : Assurez-vous que le CDC de chaque projet soit rempli avec l'IA."
     }
 ];
 
 export const INITIAL_AI_LOGS = [
     { id: 1, query: "Analyse les performances de notre campagne Google Ads du mois dernier et propose des optimisations.", user: "Ismael", date: "Aujourd'hui", category: "Analytics", status: "Success", tokens: 850 },
-    { id: 2, query: "Génère un email de relance pour les leads qui n'ont pas répondu depuis 7 jours.", user: "Gassene", date: "Hier", category: "Sales", status: "Success", tokens: 420 },
+    { id: 2, query: "Génère un email de relance pour les leads qui n'ont pas répondu depuis 7 jours.", user: "Ghassen", date: "Hier", category: "Sales", status: "Success", tokens: 420 },
     { id: 3, query: "Crée un plan de contenu SEO pour le mois de décembre ciblant les PME locales.", user: "Ismael", date: "Il y a 3j", category: "SEO", status: "Success", tokens: 1200 },
 ];
 

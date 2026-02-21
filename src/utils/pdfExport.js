@@ -4,7 +4,7 @@ import { KPIS_DATA, REVENUE_CHART_DATA, ADS_KPIS_DATA } from '../data/constants'
 
 // Helper to load and rasterize the logo
 async function loadLogo() {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
         const img = new Image();
         img.crossOrigin = 'Anonymous';
         img.src = '/logo-jannah.svg';

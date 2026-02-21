@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import * as db from '../services/supabase';
 
 export function useAiLogs() {
@@ -19,16 +19,22 @@ export function useAiLogs() {
 
     useEffect(() => { load(); }, [load]);
 
-    const addAiLog = async (log) => {
+    const addAiLog = useCallback(async (log) => {
         const newLog = await db.addAiLogRecord(log);
         setAiLogs(prev => [newLog, ...prev]);
         return newLog;
-    };
+    }, []);
 
-    const removeAiLog = async (id) => {
+    const removeAiLog = useCallback(async (id) => {
         await db.removeAiLogRecord(id);
         setAiLogs(prev => prev.filter(l => l.id !== id));
-    };
+    }, []);
 
-    return { aiLogs, setAiLogs, loading, addAiLog, removeAiLog };
+    return useMemo(() => ({
+        aiLogs,
+        setAiLogs,
+        loading,
+        addAiLog,
+        removeAiLog
+    }), [aiLogs, loading, addAiLog, removeAiLog]);
 }

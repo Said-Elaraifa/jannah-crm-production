@@ -1,6 +1,7 @@
 // src/pages/SOPs.jsx
 import { useState } from 'react';
 import { Plus, Trash2, BookOpen, X, Eye, ChevronRight, ListChecks, Video, FileText, BookMarked, Edit2, Search, Filter, FolderOpen, ExternalLink } from 'lucide-react';
+import { CustomSelect } from '../components/ui/CustomSelect';
 
 const TYPE_ICONS = { Checklist: ListChecks, Vidéo: Video, Document: FileText, Guide: BookMarked };
 const TYPE_COLORS = {
@@ -29,43 +30,45 @@ function SOPModal({ isOpen, onClose, onSave, initialData = null }) {
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in" style={{ zIndex: 9999 }} onClick={onClose}>
             <div className="bg-surface-dark w-full max-w-lg rounded-2xl border border-white/10 shadow-2xl animate-fade-in-up" onClick={e => e.stopPropagation()}>
                 <div className="flex justify-between items-center p-6 border-b border-white/5">
-                    <h3 className="text-lg font-display font-bold text-white flex items-center gap-2">
-                        {isEdit ? <Edit2 size={18} className="text-accent" /> : <BookOpen size={18} className="text-secondary" />}
+                    <h3 className="text-xl md:text-2xl font-display font-bold text-white flex items-center gap-3">
+                        {isEdit ? <Edit2 size={20} className="text-accent" /> : <BookOpen size={20} className="text-secondary" />}
                         {isEdit ? 'Modifier le SOP' : 'Nouveau SOP'}
                     </h3>
                     <button onClick={onClose} className="text-slate-400 hover:text-white p-1 hover:bg-white/5 rounded-lg transition-all"><X size={18} /></button>
                 </div>
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
                     <div>
-                        <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Titre *</label>
+                        <label className="block text-[10px] md:text-xs font-black uppercase tracking-widest text-slate-500 mb-2 ml-1">Titre *</label>
                         <input required value={form.title} onChange={e => setForm({ ...form, title: e.target.value })}
-                            className="w-full bg-bg-dark text-white text-sm rounded-xl px-4 py-2.5 border border-white/5 focus:border-primary outline-none transition-all placeholder-slate-600"
+                            className="w-full bg-black/40 text-sm font-bold rounded-xl px-4 py-3 border border-white/10 focus:border-primary/40 outline-none transition-all placeholder:text-slate-700 text-white"
                             placeholder="Ex: Processus d'onboarding client" />
                     </div>
                     <div className="grid grid-cols-3 gap-4">
                         {[
                             { key: 'category', label: 'Catégorie', options: ['Sales', 'Tech', 'Marketing', 'RH'] },
                             { key: 'type', label: 'Type', options: ['Document', 'Checklist', 'Guide', 'Vidéo'] },
-                            { key: 'author', label: 'Auteur', options: ['Ismael', 'Said', 'Ghassen'] },
+                            { key: 'author', label: 'Auteur', options: ['Ismael', 'Jessy', 'Said', 'Ghassen'] },
                         ].map(field => (
                             <div key={field.key}>
-                                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">{field.label}</label>
-                                <select value={form[field.key]} onChange={e => setForm({ ...form, [field.key]: e.target.value })}
-                                    className="w-full bg-bg-dark text-white text-sm rounded-xl px-3 py-2.5 border border-white/5 focus:border-primary outline-none cursor-pointer">
-                                    {field.options.map(o => <option key={o}>{o}</option>)}
-                                </select>
+                                <label className="block text-[10px] md:text-xs font-black uppercase tracking-widest text-slate-500 mb-2 ml-1">{field.label}</label>
+                                <CustomSelect
+                                    value={form[field.key]}
+                                    onChange={(val) => setForm({ ...form, [field.key]: val })}
+                                    options={field.options.map(o => ({ value: o, label: o }))}
+                                    className="!bg-black/40 text-white !border-white/10"
+                                />
                             </div>
                         ))}
                     </div>
                     <div>
-                        <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Contenu (Markdown supporté)</label>
+                        <label className="block text-[10px] md:text-xs font-black uppercase tracking-widest text-slate-500 mb-2 ml-1">Contenu (Markdown supporté)</label>
                         <textarea value={form.content} onChange={e => setForm({ ...form, content: e.target.value })} rows={10}
-                            className="w-full bg-bg-dark text-white text-sm rounded-xl px-4 py-3 border border-white/5 focus:border-primary outline-none transition-all resize-none placeholder-slate-600 font-mono text-xs leading-relaxed"
+                            className="w-full bg-black/40 text-sm rounded-xl px-4 py-3 border border-white/10 focus:border-primary/40 outline-none transition-all resize-none placeholder:text-slate-700 text-white font-mono leading-relaxed"
                             placeholder="# Titre Section 1\n\n- Point important 1\n- Point important 2" />
                     </div>
-                    <div className="flex gap-3 pt-2">
-                        <button type="button" onClick={onClose} className="flex-1 py-2.5 bg-white/5 hover:bg-white/10 text-slate-300 text-sm font-medium rounded-xl transition-all">Annuler</button>
-                        <button type="submit" className="flex-1 py-2.5 bg-primary hover:bg-green-700 text-white text-sm font-bold rounded-xl transition-all shadow-lg shadow-primary/20 active:scale-95">
+                    <div className="flex gap-4 pt-2">
+                        <button type="button" onClick={onClose} className="flex-1 py-3 bg-white/5 hover:bg-white/10 text-slate-300 text-[10px] md:text-xs font-black uppercase tracking-widest rounded-xl transition-all">Annuler</button>
+                        <button type="submit" className="flex-1 py-3 bg-primary hover:bg-green-700 text-white text-[10px] md:text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-[0_0_20px_rgba(16,185,129,0.3)] active:scale-95">
                             {isEdit ? 'Enregistrer' : 'Créer le SOP'}
                         </button>
                     </div>
@@ -185,33 +188,42 @@ export default function SOPs({ sops, setSops }) {
     });
 
     return (
-        <div className="space-y-6 animate-fade-in-up pb-10">
+        <div className="space-y-6 animate-fade-in pb-10">
             <SOPDetailModal sop={selectedSOP} onClose={() => setSelectedSOP(null)} onEdit={openEdit} />
             <SOPModal isOpen={modalOpen} onClose={() => setModalOpen(false)} onSave={handleSave} initialData={editingSOP} />
 
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-                <div>
-                    <h2 className="text-2xl font-display font-bold text-white tracking-tight flex items-center gap-3">
-                        Knowledge Base <span className="px-2 py-0.5 rounded-lg bg-primary/20 text-primary text-xs font-bold border border-primary/20">BETA</span>
-                    </h2>
-                    <p className="text-slate-400 mt-1 text-sm">Centre de documentation et procédures internes.</p>
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-3">
-                    <div className="relative group">
-                        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-white transition-colors" />
-                        <input
-                            type="text"
-                            placeholder="Rechercher un guide, un process..."
-                            value={searchQuery}
-                            onChange={e => setSearchQuery(e.target.value)}
-                            className="bg-surface-dark w-full sm:w-64 pl-10 pr-4 py-2.5 rounded-xl border border-white/5 focus:border-primary/50 text-sm text-white focus:outline-none transition-all"
-                        />
+            {/* Header Area */}
+            <div className="relative mb-5">
+                <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-accent/20 blur-[120px] rounded-full mix-blend-screen pointer-events-none -translate-y-1/2 animate-pulse-glow" />
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+                    <div>
+                        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-accent/10 border border-accent/20 rounded-full text-[10px] md:text-xs font-black uppercase tracking-widest text-accent mb-6 shadow-[0_0_15px_rgba(238,180,23,0.2)]">
+                            <BookOpen size={12} className="animate-pulse" /> Centre de Connaissances
+                        </div>
+                        <h1 className="text-3xl md:text-4xl font-display font-black tracking-tight mb-2 text-white">
+                            Knowledge <span className="text-accent underline decoration-accent/30 underline-offset-8">Base</span>
+                        </h1>
+                        <p className="text-slate-400 max-w-2xl text-sm md:text-base leading-relaxed font-medium mt-2">
+                            Centre de documentation et procédures internes. Retrouvez tous vos SOPs ici.
+                        </p>
                     </div>
-                    <button onClick={openAdd}
-                        className="flex items-center gap-2 px-4 py-2.5 bg-primary hover:bg-green-700 text-white text-sm font-semibold rounded-xl transition-all active:scale-95 shadow-lg shadow-primary/20 whitespace-nowrap">
-                        <Plus size={16} /> Nouveau Doc
-                    </button>
+
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <div className="relative group">
+                            <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-accent transition-colors" />
+                            <input
+                                type="text"
+                                placeholder="RECHERCHER..."
+                                value={searchQuery}
+                                onChange={e => setSearchQuery(e.target.value)}
+                                className="w-full sm:w-64 bg-black/40 text-[10px] md:text-xs font-black uppercase tracking-widest rounded-xl pl-12 pr-4 py-3 border border-white/10 focus:border-accent/40 outline-none transition-all placeholder:text-slate-700 text-white"
+                            />
+                        </div>
+                        <button onClick={openAdd}
+                            className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-accent to-yellow-500 hover:from-yellow-400 hover:to-yellow-300 text-bg-dark text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-[0_0_20px_rgba(238,180,23,0.3)] active:scale-95 whitespace-nowrap">
+                            <Plus size={16} strokeWidth={3} /> NOUVEAU DOC
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -221,9 +233,9 @@ export default function SOPs({ sops, setSops }) {
                     <button
                         key={cat}
                         onClick={() => setActiveCategory(cat)}
-                        className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all whitespace-nowrap ${activeCategory === cat
-                            ? 'bg-white text-[#12202c] shadow-lg shadow-white/10'
-                            : 'bg-surface-dark text-slate-400 hover:text-white hover:bg-white/5 border border-white/5'
+                        className={`px-6 py-2.5 rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${activeCategory === cat
+                            ? 'bg-white text-bg-dark shadow-lg shadow-white/10'
+                            : 'bg-surface-dark text-slate-500 hover:text-white hover:bg-white/5 border border-white/5'
                             }`}
                     >
                         {cat}
@@ -251,11 +263,12 @@ export default function SOPs({ sops, setSops }) {
                             <div
                                 key={sop.id}
                                 onClick={() => setSelectedSOP(sop)}
-                                className="bg-surface-dark rounded-2xl p-5 border border-white/5 hover:border-primary/30 transition-all group cursor-pointer hover:shadow-xl hover:shadow-black/20 flex flex-col h-full"
+                                className="bg-surface-dark/40 backdrop-blur-xl rounded-2xl p-4.5 border border-white/10 hover:border-white/20 transition-all group cursor-pointer shadow-[0_8px_32px_rgba(0,0,0,0.3)] hover:-translate-y-1 flex flex-col h-full relative overflow-hidden"
                             >
-                                <div className="flex justify-between items-start mb-4">
-                                    <div className={`p-3 rounded-xl ${TYPE_COLORS[sop.type] || 'text-slate-400 bg-slate-500/10'} group-hover:scale-110 transition-transform duration-300`}>
-                                        <Icon size={20} />
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 blur-[40px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+                                <div className="flex justify-between items-start mb-6 relative z-10">
+                                    <div className={`p-2.5 rounded-xl ${TYPE_COLORS[sop.type] || 'text-slate-400 bg-slate-500/10'} group-hover:scale-110 transition-transform duration-300`}>
+                                        <Icon size={18} />
                                     </div>
                                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                         <button onClick={(e) => { e.stopPropagation(); openEdit(sop); }}
@@ -273,7 +286,7 @@ export default function SOPs({ sops, setSops }) {
                                     <div className="flex items-center gap-2 mb-2">
                                         <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 border border-slate-700/50 px-1.5 py-0.5 rounded">{sop.category}</span>
                                     </div>
-                                    <h4 className="font-bold text-white text-base leading-snug group-hover:text-primary transition-colors line-clamp-2">
+                                    <h4 className="font-bold text-white text-sm leading-snug group-hover:text-primary transition-colors line-clamp-2">
                                         {sop.title}
                                     </h4>
                                 </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import * as db from '../services/supabase';
 
 export function useClients() {
@@ -43,7 +43,7 @@ export function useClients() {
         };
     }, [load]);
 
-    const addClient = async (client) => {
+    const addClient = useCallback(async (client) => {
         const newClient = await db.addClientRecord(client);
         setClients(prev => [newClient, ...prev]);
 
@@ -55,9 +55,9 @@ export function useClients() {
         }).catch(err => console.error('Notification failed:', err));
 
         return newClient;
-    };
+    }, []);
 
-    const editClient = async (id, updates) => {
+    const editClient = useCallback(async (id, updates) => {
         const updated = await db.updateClientRecord(id, updates);
         setClients(prev => prev.map(c => c.id === id ? updated : c));
 
@@ -71,12 +71,21 @@ export function useClients() {
         }
 
         return updated;
-    };
+    }, []);
 
-    const removeClient = async (id) => {
+    const removeClient = useCallback(async (id) => {
         await db.removeClientRecord(id);
         setClients(prev => prev.filter(c => c.id !== id));
-    };
+    }, []);
 
-    return { clients, setClients, loading, error, addClient, editClient, removeClient, reload: load };
+    return useMemo(() => ({
+        clients,
+        setClients,
+        loading,
+        error,
+        addClient,
+        editClient,
+        removeClient,
+        reload: load
+    }), [clients, loading, error, addClient, editClient, removeClient, load]);
 }

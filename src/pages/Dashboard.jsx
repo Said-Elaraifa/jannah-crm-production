@@ -7,26 +7,9 @@ import { getKpisData, getRevenueData, getActivityLogs } from '../services/supaba
 
 Chart.register(...registerables);
 
-function StatCard({ kpi }) {
-    const isUp = kpi.trend === 'up';
-    return (
-        <div className="bg-surface-dark p-5 rounded-2xl border border-white/5 hover:border-primary/30 transition-all duration-300 animate-fade-in-up">
-            <div className="flex justify-between items-start mb-4">
-                <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{kpi.label}</h3>
-                <div className={`p-1.5 rounded-lg ${kpi.bg_color} ${kpi.color}`}>
-                    {kpi.icon ? <kpi.icon size={15} /> : (isUp ? <TrendingUp size={15} /> : <TrendingDown size={15} />)}
-                </div>
-            </div>
-            <div className="mb-2">
-                <span className="text-2xl font-display font-bold text-white tracking-tight">{kpi.value}</span>
-            </div>
-            <div className="flex items-center gap-2 text-xs">
-                <span className={`${kpi.color} font-bold px-1.5 py-0.5 rounded ${kpi.bg_color}`}>{kpi.change}</span>
-                <span className="text-slate-500">vs mois dernier</span>
-            </div>
-        </div>
-    );
-}
+import { DashboardStatCard } from '../features/dashboard/components/DashboardStatCard';
+import { ActivityFeed } from '../features/admin/components/ActivityFeed';
+import { CustomSelect } from '../components/ui/CustomSelect';
 
 export default function Dashboard({ onNewClient, currentUser }) {
     const chartRef = useRef(null);
@@ -213,60 +196,73 @@ export default function Dashboard({ onNewClient, currentUser }) {
     }
 
     const isAdmin = currentUser?.roleId === 'admin';
+    const isCeo = currentUser?.roleId === 'ceo';
     const isSales = currentUser?.roleId === 'sales';
     const isTech = currentUser?.roleId === 'tech';
+    const isExecutive = isAdmin || isCeo;
 
     return (
-        <div className="space-y-6 animate-fade-in-up">
-            {/* Page Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                    <h2 className="text-2xl font-display font-bold text-white tracking-tight flex items-center gap-2">
-                        {isSales ? 'Sales Dashboard' : isTech ? 'Tech Dashboard' : 'CEO Performance'}
-                        {isSales && <span className="px-2 py-0.5 bg-yellow-500/10 text-yellow-400 text-xs rounded border border-yellow-500/20">SALES</span>}
-                        {isTech && <span className="px-2 py-0.5 bg-blue-500/10 text-blue-400 text-xs rounded border border-blue-500/20">TECH</span>}
-                    </h2>
-                    <p className="text-slate-400 mt-1 text-sm">Bienvenue {currentUser?.name}, voici vos résultats.</p>
-                </div>
-                <div className="flex items-center gap-3">
-                    {isAdmin && (
-                        <button
-                            onClick={handleExportPDF}
-                            disabled={isExporting}
-                            className="flex items-center gap-2 px-4 py-2.5 bg-surface-dark border border-white/5 hover:border-white/20 text-slate-300 hover:text-white text-sm font-medium rounded-xl transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            {isExporting ? <Loader2 size={15} className="animate-spin" /> : <Download size={15} />}
-                            {isExporting ? 'Génération...' : 'Exporter PDF'}
-                        </button>
-                    )}
-                    {(isAdmin || isSales) && (
-                        <button
-                            onClick={onNewClient}
-                            className="flex items-center gap-2 px-4 py-2.5 bg-secondary hover:bg-[#b0cc65] text-primary text-sm font-bold rounded-xl transition-all active:scale-95 shadow-lg shadow-secondary/20"
-                        >
-                            <Plus size={15} />
-                            Client
-                        </button>
-                    )}
+        <div className="w-full space-y-6 pb-10 animate-fade-in">
+            {/* Header Area */}
+            <div className="relative mb-6">
+                <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-accent/20 blur-[120px] rounded-full mix-blend-screen pointer-events-none -translate-y-1/2 animate-pulse-glow" />
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+                    <div>
+                        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-accent/10 border border-accent/20 rounded-full text-[10px] md:text-xs font-black uppercase tracking-widest text-accent mb-6 shadow-[0_0_15px_rgba(238,180,23,0.2)]">
+                            <Activity size={12} className="animate-pulse" /> Vue d'ensemble
+                        </div>
+                        <h1 className="text-3xl md:text-4xl font-display font-black tracking-tight mb-2 text-slate-900 dark:text-white">
+                            {isSales ? 'Sales' : isTech ? 'Tech' : 'CEO'} <span className="text-accent underline decoration-accent/30 underline-offset-8">Dashboard</span>
+                        </h1>
+                        <p className="text-slate-600 dark:text-slate-400 max-w-2xl text-sm md:text-base leading-relaxed font-medium mt-2">
+                            Bienvenue {currentUser?.name}, voici l'état en temps réel de vos opérations et KPIs.
+                        </p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        {isAdmin && (
+                            <button
+                                onClick={handleExportPDF}
+                                disabled={isExporting}
+                                className="flex items-center gap-2 px-6 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-900 dark:text-white text-[10px] md:text-xs font-black uppercase tracking-widest rounded-xl transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {isExporting ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
+                                {isExporting ? 'Génération...' : 'Export PDF'}
+                            </button>
+                        )}
+                        {(isAdmin || isSales) && (
+                            <button
+                                onClick={onNewClient}
+                                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-accent to-yellow-500 hover:from-yellow-400 hover:to-yellow-300 text-bg-dark text-[10px] md:text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-[0_0_20px_rgba(238,180,23,0.3)] active:scale-95"
+                            >
+                                <Plus size={16} /> CLIENT
+                            </button>
+                        )}
+                    </div>
                 </div>
             </div>
 
             {/* KPI Cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                {kpis.map(kpi => <StatCard key={kpi.id} kpi={kpi} />)}
+                {kpis.map(kpi => <DashboardStatCard key={kpi.id} kpi={kpi} />)}
             </div>
 
-            {/* Charts Row (Only for Admin) */}
-            {isAdmin && (
+            {/* Charts Row (Only for Admin/CEO) */}
+            {isExecutive && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Revenue Chart */}
-                    <div className="lg:col-span-2 bg-surface-dark p-6 rounded-2xl border border-white/5">
+                    <div className="lg:col-span-2 bg-surface-dark/40 backdrop-blur-xl rounded-3xl border border-slate-200 dark:border-white/10 p-5 shadow-[0_8px_32px_rgba(0,0,0,0.1)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)] relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-accent/5 blur-[80px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
                         <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-base font-display font-bold text-white">Revenus vs Ads</h3>
-                            <select className="bg-bg-dark border-none text-xs rounded-lg px-3 py-1.5 text-slate-400 focus:ring-0 cursor-pointer outline-none">
-                                <option>Derniers 8 mois</option>
-                                <option>Cette année</option>
-                            </select>
+                            <h3 className="text-base md:text-lg font-bold text-slate-900 dark:text-white">Revenus vs Ads</h3>
+                            <CustomSelect
+                                value="Derniers 8 mois"
+                                onChange={() => { }}
+                                options={[
+                                    { value: 'Derniers 8 mois', label: 'Derniers 8 mois' },
+                                    { value: 'Cette année', label: 'Cette année' }
+                                ]}
+                                className="!w-40 text-xs"
+                            />
                         </div>
                         <div className="relative h-56">
                             <canvas ref={chartRef} />
@@ -274,44 +270,23 @@ export default function Dashboard({ onNewClient, currentUser }) {
                     </div>
 
                     {/* Activity Feed */}
-                    <div className="bg-surface-dark p-6 rounded-2xl border border-white/5 flex flex-col">
-                        <div className="flex justify-between items-center mb-5">
-                            <div className="flex items-center gap-2">
-                                <Zap size={16} className="text-accent" />
-                                <h3 className="text-base font-display font-bold text-white">Activité</h3>
-                            </div>
-                            <button className="text-xs text-primary hover:text-secondary transition-colors">Voir tout</button>
-                        </div>
-                        <div className="flex-1 space-y-4 overflow-y-auto custom-scrollbar">
-                            {activities.map(act => (
-                                <div key={act.id} className="flex gap-3 group">
-                                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold flex-shrink-0 ${act.user_color}`}>
-                                        {act.user_initials}
-                                    </div>
-                                    <div className="flex-1 pb-4 border-b border-white/5 group-last:border-0">
-                                        <div className="flex justify-between items-start">
-                                            <h4 className="text-sm font-semibold text-white leading-tight">{act.action}</h4>
-                                            <span className="text-[10px] text-slate-500 ml-2 flex-shrink-0">{act.time_text}</span>
-                                        </div>
-                                        <p className="text-xs text-slate-500 mt-1">{act.detail}</p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
+                    <div className="bg-surface-dark/40 backdrop-blur-xl rounded-3xl border border-slate-200 dark:border-white/10 p-5 shadow-[0_8px_32px_rgba(0,0,0,0.1)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)] flex flex-col relative overflow-hidden">
+                        <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary/10 blur-[80px] rounded-full translate-y-1/2 -translate-x-1/2 pointer-events-none" />
+                        <ActivityFeed />
                     </div>
                 </div>
             )}
 
-            {/* Alternative View for Tech/Sales (Placeholder for now, can be expanded) */}
-            {(!isAdmin) && (
-                <div className="bg-surface-dark p-8 rounded-2xl border border-white/5 text-center">
-                    <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
-                        {isSales ? <DollarSign className="text-yellow-400" size={32} /> : <Server className="text-blue-400" size={32} />}
+            {/* Alternative View for Tech/Sales */}
+            {(!isExecutive) && (
+                <div className="bg-surface-dark/40 backdrop-blur-xl rounded-[2rem] border border-slate-200 dark:border-white/10 p-8 md:p-12 shadow-[0_8px_32px_rgba(0,0,0,0.1)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)] text-center relative overflow-hidden inline-[mx-auto]">
+                    <div className="w-20 h-20 bg-slate-100 dark:bg-white/5 rounded-[2rem] border border-slate-200 dark:border-white/10 flex items-center justify-center mx-auto mb-6 shadow-inner relative z-10">
+                        {isSales ? <DollarSign className="text-yellow-500 dark:text-yellow-400" size={32} /> : <Server className="text-blue-500 dark:text-blue-400" size={32} />}
                     </div>
-                    <h3 className="text-xl font-bold text-white mb-2">
+                    <h3 className="text-2xl md:text-3xl font-display font-black text-slate-900 dark:text-white tracking-tight mb-4 relative z-10">
                         {isSales ? 'Espace Sales Dédié' : 'Espace Technique Dédié'}
                     </h3>
-                    <p className="text-slate-400 max-w-md mx-auto">
+                    <p className="text-slate-600 dark:text-slate-400 max-w-md mx-auto text-sm leading-relaxed relative z-10">
                         {isSales ? 'Gérez vos leads et suivez vos commissions depuis cet espace optimisé.' : 'Monitorez les serveurs et gérez les déploiements depuis la console technique.'}
                     </p>
                 </div>

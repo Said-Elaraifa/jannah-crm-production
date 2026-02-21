@@ -19,20 +19,70 @@ export async function getClients() {
 }
 
 export async function addClientRecord(client) {
-    const { data, error } = await supabase.from('clients').insert([client]).select().single();
-    if (error) throw error;
-    return data;
+    try {
+        console.log('[API] addClientRecord Payload:', client);
+        const { data, error } = await supabase.from('clients').insert([client]).select().single();
+        if (error) {
+            console.error('[API Error] addClientRecord:', error);
+            throw error;
+        }
+        console.log('[API] addClientRecord Response:', data);
+
+        logActivity({
+            action: 'CREATE',
+            resource_type: 'clients',
+            resource_id: data.id,
+            metadata: { new: data },
+            detail: `Nouveau client : ${data.name}`
+        });
+
+        return data;
+    } catch (e) {
+        console.error('[API Exception] addClientRecord:', e);
+        throw e;
+    }
 }
 
 export async function updateClientRecord(id, updates) {
-    const { data, error } = await supabase.from('clients').update(updates).eq('id', id).select().single();
-    if (error) throw error;
-    return data;
+    try {
+        // Strip out read-only fields before sending to Supabase
+        const payload = { ...updates };
+        delete payload.id;
+        delete payload.created_at;
+
+        console.log(`[API] updateClientRecord Payload for ID ${id}:`, payload);
+        const { data, error } = await supabase.from('clients').update(payload).eq('id', id).select().single();
+        if (error) {
+            console.error('[API Error] updateClientRecord:', error);
+            throw error;
+        }
+        console.log('[API] updateClientRecord Response:', data);
+
+        logActivity({
+            action: 'UPDATE',
+            resource_type: 'clients',
+            resource_id: id,
+            metadata: { updates: payload },
+            detail: `Mise à jour client : ${data.name}`
+        });
+
+        return data;
+    } catch (e) {
+        console.error('[API Exception] updateClientRecord:', e);
+        throw e;
+    }
 }
 
 export async function removeClientRecord(id) {
     const { error } = await supabase.from('clients').delete().eq('id', id);
     if (error) throw error;
+
+    logActivity({
+        action: 'DELETE',
+        resource_type: 'clients',
+        resource_id: id,
+        detail: `Client supprimé (ID: ${id})`
+    });
 }
 
 // ─── CAHIER DES CHARGES ──────────────────────────────────────────────────────
@@ -127,6 +177,14 @@ export async function addLeadRecord(lead) {
     const { data, error } = await supabase.from('leads').insert([lead]).select().single();
     if (error) throw error;
 
+    logActivity({
+        action: 'CREATE',
+        resource_type: 'leads',
+        resource_id: data.id,
+        metadata: { new: data },
+        detail: `Nouveau lead : ${data.company}`
+    });
+
     // Trigger Slack Notification if configured
     try {
         const { data: slackInt } = await supabase
@@ -154,12 +212,28 @@ export async function addLeadRecord(lead) {
 export async function updateLeadRecord(id, updates) {
     const { data, error } = await supabase.from('leads').update(updates).eq('id', id).select().single();
     if (error) throw error;
+
+    logActivity({
+        action: 'UPDATE',
+        resource_type: 'leads',
+        resource_id: id,
+        metadata: { updates },
+        detail: `Mise à jour lead : ${data.company}`
+    });
+
     return data;
 }
 
 export async function removeLeadRecord(id) {
     const { error } = await supabase.from('leads').delete().eq('id', id);
     if (error) throw error;
+
+    logActivity({
+        action: 'DELETE',
+        resource_type: 'leads',
+        resource_id: id,
+        detail: `Lead supprimé (ID: ${id})`
+    });
 }
 
 // ─── SOPS ────────────────────────────────────────────────────────────────────
@@ -173,18 +247,43 @@ export async function getSops() {
 export async function addSopRecord(sop) {
     const { data, error } = await supabase.from('sops').insert([sop]).select().single();
     if (error) throw error;
+
+    logActivity({
+        action: 'CREATE',
+        resource_type: 'sops',
+        resource_id: data.id,
+        metadata: { new: data },
+        detail: `Nouveau SOP : ${data.title}`
+    });
+
     return data;
 }
 
 export async function updateSopRecord(id, updates) {
     const { data, error } = await supabase.from('sops').update(updates).eq('id', id).select().single();
     if (error) throw error;
+
+    logActivity({
+        action: 'UPDATE',
+        resource_type: 'sops',
+        resource_id: id,
+        metadata: { updates },
+        detail: `Mise à jour SOP : ${data.title}`
+    });
+
     return data;
 }
 
 export async function removeSopRecord(id) {
     const { error } = await supabase.from('sops').delete().eq('id', id);
     if (error) throw error;
+
+    logActivity({
+        action: 'DELETE',
+        resource_type: 'sops',
+        resource_id: id,
+        detail: `SOP supprimé (ID: ${id})`
+    });
 }
 
 // ─── AI LOGS ─────────────────────────────────────────────────────────────────
@@ -315,14 +414,40 @@ export async function fetchClientActivityLogs(clientId) {
     return data;
 }
 
+export async function logActivity({ action, resource_type, resource_id, metadata = {}, detail = "" }) {
+    try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const user = session?.user;
+
+        const logPayload = {
+            user_id: user?.id || null,
+            user_name: user?.email?.split('@')[0] || 'Système',
+            action_type: action,
+            resource_type,
+            resource_id,
+            metadata,
+            detail: detail || `${action} sur ${resource_type}`,
+            time_text: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+        };
+
+        // Fire and forget - use non-await to not block the main process
+        supabase.from('activity_logs').insert([logPayload]).then(({ error }) => {
+            if (error) console.error('Activity log insertion failed:', error);
+        });
+    } catch (e) {
+        console.error('Failed to log activity:', e);
+    }
+}
+
 export async function logClientActivity(log) {
-    const { data, error } = await supabase
-        .from('activity_logs')
-        .insert([log])
-        .select()
-        .single();
-    if (error) throw error;
-    return data;
+    // Legacy support or specific client logs
+    return logActivity({
+        action: log.action || 'ACTIVITY',
+        resource_type: 'clients',
+        resource_id: log.client_id,
+        detail: log.detail,
+        metadata: log.metadata
+    });
 }
 // ─── NOTIFICATIONS ───────────────────────────────────────────────────────────
 export async function getNotifications() {

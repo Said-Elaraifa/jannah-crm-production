@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import * as db from '../services/supabase';
 
 export function useLeads() {
@@ -42,7 +42,7 @@ export function useLeads() {
         };
     }, [load]);
 
-    const addLead = async (lead) => {
+    const addLead = useCallback(async (lead) => {
         const newLead = await db.addLeadRecord(lead);
         setLeads(prev => [newLead, ...prev]);
 
@@ -54,22 +54,30 @@ export function useLeads() {
         }).catch(err => console.error('Notification failed:', err));
 
         return newLead;
-    };
+    }, []);
 
-    const editLead = async (id, updates) => {
+    const editLead = useCallback(async (id, updates) => {
         const updated = await db.updateLeadRecord(id, updates);
         setLeads(prev => prev.map(l => l.id === id ? updated : l));
         return updated;
-    };
+    }, []);
 
-    const removeLead = async (id) => {
+    const removeLead = useCallback(async (id) => {
         await db.removeLeadRecord(id);
         setLeads(prev => prev.filter(l => l.id !== id));
-    };
+    }, []);
 
-    const moveLead = async (id, newStage) => {
+    const moveLead = useCallback(async (id, newStage) => {
         return editLead(id, { stage: newStage });
-    };
+    }, [editLead]);
 
-    return { leads, setLeads, loading, addLead, editLead, removeLead, moveLead };
+    return useMemo(() => ({
+        leads,
+        setLeads,
+        loading,
+        addLead,
+        editLead,
+        removeLead,
+        moveLead
+    }), [leads, loading, addLead, editLead, removeLead, moveLead]);
 }
