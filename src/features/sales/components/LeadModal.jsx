@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, X, Edit2 } from 'lucide-react';
 import { TEAM_MEMBERS } from '../../../data/constants';
 import { STAGES, SOURCES } from '../constants';
@@ -8,12 +8,22 @@ import { CustomSelect } from '../../../components/ui/CustomSelect';
 export function LeadModal({ isOpen, onClose, onSave, initialData = null, defaultStage = 'new' }) {
     const isEdit = !!initialData;
     const [saving, setSaving] = useState(false);
-    const [form, setForm] = useState(initialData || {
+
+    const getInitialForm = () => initialData || {
         company: '', contact: '', email: '', phone: '',
         value: '', stage: defaultStage, score: 50, source: 'Inbound',
         notes: '', assigned_to: TEAM_MEMBERS[0]?.name || 'Ghassen',
         probability: 50, next_step: '', last_contact: new Date().toISOString().split('T')[0]
-    });
+    };
+
+    const [form, setForm] = useState(getInitialForm());
+
+    useEffect(() => {
+        if (isOpen) {
+            setForm(getInitialForm());
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isOpen, initialData, defaultStage]);
 
     if (!isOpen) return null;
 
@@ -28,6 +38,8 @@ export function LeadModal({ isOpen, onClose, onSave, initialData = null, default
             probability: parseInt(form.probability) || 50,
         };
 
+        const originalId = form.id;
+
         // Always remove read-only auto-generated fields to prevent Supabase update rejection
         delete payload.id;
         delete payload.created_at;
@@ -35,7 +47,7 @@ export function LeadModal({ isOpen, onClose, onSave, initialData = null, default
 
         setSaving(true);
         try {
-            await onSave(payload);
+            await onSave(originalId ? { id: originalId, ...payload } : payload);
             onClose();
         } catch (error) {
             console.error(error);

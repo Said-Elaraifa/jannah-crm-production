@@ -210,14 +210,18 @@ export async function addLeadRecord(lead) {
 }
 
 export async function updateLeadRecord(id, updates) {
-    const { data, error } = await supabase.from('leads').update(updates).eq('id', id).select().single();
+    const payload = { ...updates };
+    delete payload.id;
+    delete payload.created_at;
+
+    const { data, error } = await supabase.from('leads').update(payload).eq('id', id).select().single();
     if (error) throw error;
 
     logActivity({
         action: 'UPDATE',
         resource_type: 'leads',
         resource_id: id,
-        metadata: { updates },
+        metadata: { updates: payload },
         detail: `Mise à jour lead : ${data.company}`
     });
 
