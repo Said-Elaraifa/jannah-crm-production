@@ -169,19 +169,19 @@ export default function Settings({ currentUser, setCurrentUser }) {
             />
 
             {/* Header Area */}
-            <div className="relative mb-8 z-10">
+            <div className="relative mb-8 z-10 w-full flex-shrink-0">
                 <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-accent/20 blur-[120px] rounded-full mix-blend-screen pointer-events-none -translate-y-1/2 animate-pulse-glow" />
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10 w-full">
                     <div>
                         <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-accent/10 border border-accent/20 rounded-full text-[10px] md:text-xs font-black uppercase tracking-widest text-accent mb-6 shadow-[0_0_15px_rgba(238,180,23,0.2)]">
                             <Shield size={12} className="animate-pulse" /> Configuration Système
                         </div>
-                        <h1 className="text-4xl md:text-5xl font-display font-black tracking-tight mb-4 text-white flex items-center gap-4">
+                        <h1 className="text-4xl md:text-5xl font-display font-black tracking-tight mb-4 text-slate-900 dark:text-white flex items-center gap-4">
                             Paramètres
-                            {isAdmin && <span className="px-3 py-1 rounded-xl bg-red-500/10 text-red-500 text-[10px] md:text-xs font-black uppercase tracking-widest border border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.2)] flex items-center gap-1"><Lock size={10} /> ADMIN</span>}
+                            {isAdmin && <span className="px-3 py-1 rounded-xl bg-red-500/10 text-red-500 text-[10px] md:text-xs font-black uppercase tracking-widest border border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.1)] flex items-center gap-1"><Lock size={10} /> ADMIN</span>}
                         </h1>
-                        <p className="text-slate-400 max-w-2xl text-base md:text-lg leading-relaxed font-medium mt-4">
-                            {isAdmin ? "Configuration globale et gestion de l'organisation." : 'Gérez vos préférences personnelles.'}
+                        <p className="text-slate-500 dark:text-slate-400 max-w-2xl text-base md:text-lg leading-relaxed font-medium mt-4">
+                            {isAdmin ? "Configuration globale et gestion de l'organisation." : 'Gérez vos préférences personnelles et la sécurité de votre compte.'}
                         </p>
                     </div>
 
@@ -197,13 +197,13 @@ export default function Settings({ currentUser, setCurrentUser }) {
                                 options={team.map(m => ({ value: m.id, label: m.name }))}
                                 placeholder="Voir comme..."
                                 icon={Eye}
-                                className="!bg-surface-dark/40 !backdrop-blur-xl border-white/10 hover:!border-white/20 !py-3 shadow-[0_8px_32px_rgba(0,0,0,0.3)] !rounded-xl"
+                                className="!bg-white dark:!bg-surface-dark/40 !backdrop-blur-xl border-slate-200 dark:border-white/10 hover:!border-slate-300 dark:hover:!border-white/20 !py-3 shadow-sm !rounded-xl text-slate-900 dark:text-white"
                             />
                         </div>
 
                         <button
                             onClick={() => signOut()}
-                            className="flex items-center justify-center gap-2 px-6 py-3.5 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white text-[10px] md:text-xs font-black uppercase tracking-widest rounded-xl transition-all border border-red-500/20 active:scale-95 whitespace-nowrap"
+                            className="flex items-center justify-center gap-2 px-6 py-3.5 bg-red-500/10 hover:bg-red-500 text-red-600 dark:text-red-400 hover:text-white text-[10px] md:text-xs font-black uppercase tracking-widest rounded-xl transition-all border border-red-500/20 active:scale-95 whitespace-nowrap"
                         >
                             <LogOut size={16} strokeWidth={3} /> DÉCONNEXION
                         </button>
@@ -212,23 +212,25 @@ export default function Settings({ currentUser, setCurrentUser }) {
             </div>
 
             {/* Navigation Tabs */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-4 border-b border-white/5 custom-scrollbar">
-                {TABS.map(tab => {
-                    const Icon = tab.icon;
-                    const isActive = activeTab === tab.id;
-                    return (
-                        <button
-                            key={tab.id}
-                            onClick={() => setActiveTab(tab.id)}
-                            className={`flex items-center gap-2 px-6 py-3 text-[10px] md:text-xs font-black uppercase tracking-widest rounded-t-xl border-b-2 transition-all cursor-pointer whitespace-nowrap ${isActive
-                                ? 'border-primary text-white bg-white/5'
-                                : 'border-transparent text-slate-500 hover:text-white hover:bg-white/5'
-                                }`}
-                        >
-                            <Icon size={16} /> {tab.label}
-                        </button>
-                    );
-                })}
+            <div className="flex items-center gap-2 overflow-x-auto pb-4 custom-scrollbar relative z-10">
+                <div className="flex bg-white/50 dark:bg-surface-dark/40 backdrop-blur-md rounded-2xl border border-slate-200 dark:border-white/10 p-1 shadow-sm">
+                    {TABS.map(tab => {
+                        const Icon = tab.icon;
+                        const isActive = activeTab === tab.id;
+                        return (
+                            <button
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id)}
+                                className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${isActive
+                                    ? 'bg-slate-900 dark:bg-white text-white dark:text-bg-dark shadow-lg shadow-black/10 dark:shadow-white/10'
+                                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                                    }`}
+                            >
+                                <Icon size={16} /> {tab.label}
+                            </button>
+                        );
+                    })}
+                </div>
             </div>
 
             {/* Invite success toast */}

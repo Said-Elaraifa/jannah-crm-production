@@ -17,7 +17,30 @@ export function useSops() {
         }
     }, []);
 
-    useEffect(() => { load(); }, [load]);
+    useEffect(() => {
+        load();
+
+        // Real-time synchronization
+        const subscription = db.supabase
+            .channel('sops-realtime')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'sops' }, (payload) => {
+                if (payload.eventType === 'INSERT') {
+                    setSops(prev => {
+                        if (prev.find(s => s.id === payload.new.id)) return prev;
+                        return [payload.new, ...prev];
+                    });
+                } else if (payload.eventType === 'UPDATE') {
+                    setSops(prev => prev.map(s => s.id === payload.new.id ? payload.new : s));
+                } else if (payload.eventType === 'DELETE') {
+                    setSops(prev => prev.filter(s => s.id !== payload.old.id));
+                }
+            })
+            .subscribe();
+
+        return () => {
+            db.supabase.removeChannel(subscription);
+        };
+    }, [load]);
 
     const addSop = useCallback(async (sop) => {
         const newSop = await db.addSopRecord(sop);

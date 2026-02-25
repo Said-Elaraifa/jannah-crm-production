@@ -9,7 +9,7 @@ export function ThemeProvider({ children }) {
         if (savedTheme) {
             return savedTheme;
         }
-        // Fallback to system preference (default dark for Jannah OS 1.0)
+        // Fallback to system preference (default dark for Jannah OS 1.5)
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
             return 'light';
         }

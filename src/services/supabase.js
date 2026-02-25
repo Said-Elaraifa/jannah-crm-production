@@ -18,6 +18,16 @@ export async function getClients() {
     return data;
 }
 
+export async function getClientNameBySlug(slug) {
+    const { data, error } = await supabase
+        .from('clients')
+        .select('name')
+        .eq('slug', slug)
+        .maybeSingle();
+    if (error) return null;
+    return data?.name;
+}
+
 export async function addClientRecord(client) {
     try {
         console.log('[API] addClientRecord Payload:', client);

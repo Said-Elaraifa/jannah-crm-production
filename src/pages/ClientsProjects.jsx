@@ -41,22 +41,22 @@ const ClientsProjects = memo(({ clients, setClients, onAddClient, onEditClient, 
             )}
 
             {/* Header Area */}
-            <div className="relative mb-6">
+            <div className="relative mb-8 z-10 w-full flex-shrink-0">
                 <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-accent/20 blur-[120px] rounded-full mix-blend-screen pointer-events-none -translate-y-1/2 animate-pulse-glow" />
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10 w-full">
                     <div>
                         <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-accent/10 border border-accent/20 rounded-full text-[10px] md:text-xs font-black uppercase tracking-widest text-accent mb-6 shadow-[0_0_15px_rgba(238,180,23,0.2)]">
                             <Users size={12} className="animate-pulse" /> CRM Center
                         </div>
-                        <h1 className="text-3xl md:text-4xl font-display font-black tracking-tight mb-2 text-slate-900 dark:text-white">
+                        <h1 className="text-4xl md:text-5xl font-display font-black tracking-tight mb-4 text-slate-900 dark:text-white flex flex-wrap items-center gap-4">
                             Écosystème <span className="text-accent underline decoration-accent/30 underline-offset-8">Clients</span>
                         </h1>
-                        <p className="text-slate-600 dark:text-slate-400 max-w-2xl text-sm md:text-base leading-relaxed font-medium mt-2">
+                        <p className="text-slate-500 dark:text-slate-400 max-w-2xl text-base md:text-lg leading-relaxed font-medium mt-4">
                             Architecture centrale de vos relations agence. Gérez, suivez et optimisez chaque dossier avec une précision chirurgicale.
                         </p>
                     </div>
                     <div>
-                        <button onClick={onNewClient} className="flex items-center gap-2 px-5 py-3.5 bg-gradient-to-r from-accent to-yellow-500 hover:from-yellow-400 hover:to-yellow-300 text-bg-dark text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-[0_0_20px_rgba(238,180,23,0.3)] active:scale-95">
+                        <button onClick={onNewClient} className="flex items-center gap-2 px-6 py-3.5 bg-gradient-to-r from-accent to-yellow-500 hover:from-yellow-400 hover:to-yellow-300 text-bg-dark text-[10px] md:text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-[0_0_20px_rgba(238,180,23,0.3)] active:scale-95 whitespace-nowrap">
                             <Plus size={16} strokeWidth={3} /> INITIALISER UN PROJET
                         </button>
                     </div>
@@ -64,13 +64,13 @@ const ClientsProjects = memo(({ clients, setClients, onAddClient, onEditClient, 
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <StatCard kpi={{ label: "Projets en Run", value: clients?.filter(c => c.status === 'En Développement').length || 0, trend: 'up', color: 'text-blue-400', bgColor: 'bg-blue-500/10' }} />
+                <StatCard kpi={{ label: "Projets en Run", value: clients?.filter(c => c.status === 'En Développement').length || 0, trend: 'up', color: 'text-blue-500 dark:text-blue-400', bgColor: 'bg-blue-500/10' }} />
                 <StatCard kpi={{ label: "Onboarding", value: clients?.filter(c => !c.cahier_completed).length || 0, trend: 'up', color: 'text-accent', bgColor: 'bg-accent/10' }} />
                 <StatCard kpi={{ label: "Success Rate", value: "100%", trend: 'up', color: 'text-[#c3dc7f]', bgColor: 'bg-[#c3dc7f]/10' }} />
-                <StatCard kpi={{ label: "Total Portefeuille", value: clients?.length || 0, trend: 'up', color: 'text-purple-400', bgColor: 'bg-purple-500/10' }} />
+                <StatCard kpi={{ label: "Total Portefeuille", value: clients?.length || 0, trend: 'up', color: 'text-purple-500 dark:text-purple-400', bgColor: 'bg-purple-500/10' }} />
             </div>
 
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6 bg-surface-dark/40 backdrop-blur-xl p-4 rounded-3xl border border-slate-200 dark:border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.1)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)] relative overflow-hidden">
+            <div className="bg-white dark:bg-surface-dark/40 backdrop-blur-xl p-4 rounded-2xl border border-slate-200 dark:border-white/10 shadow-sm relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-accent/5 blur-[80px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
                 <div className="flex bg-slate-100 dark:bg-black/40 rounded-2xl p-1 gap-1 border border-slate-200 dark:border-white/5 relative z-10 w-full md:w-auto overflow-x-auto custom-scrollbar">
                     {['Tous', 'En Progrès', 'Live'].map(t => (

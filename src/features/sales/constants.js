@@ -7,7 +7,17 @@ export const STAGES = [
     { id: 'won', label: 'Signés 🎉', color: 'border-primary', dot: 'bg-secondary', textColor: 'text-secondary', bg: 'bg-primary/10' },
 ];
 
-export const SOURCES = ['Google Ads', 'Meta Ads', 'SEO', 'LinkedIn', 'Référence', 'Inbound', 'Cold Email', 'Événement'];
+export const SOURCES = ['Google Ads', 'Meta Ads', 'SEO', 'LinkedIn', 'TikTok', 'Référence', 'Inbound', 'Cold Email', 'Cold Call', 'Événement'];
+
+// Social-network filter tabs — each maps to one or more lead.source values
+export const SOURCE_TABS = [
+    { id: 'all', label: 'Toutes', emoji: '🌐', match: null },
+    { id: 'facebook', label: 'Facebook', emoji: '📘', match: ['Meta Ads', 'Facebook'] },
+    { id: 'linkedin', label: 'LinkedIn', emoji: '💼', match: ['LinkedIn'] },
+    { id: 'tiktok', label: 'TikTok', emoji: '🎵', match: ['TikTok'] },
+    { id: 'google', label: 'Google', emoji: '🔍', match: ['Google Ads', 'Google', 'SEO'] },
+    { id: 'manual', label: 'Manuel', emoji: '✍️', match: ['Inbound', 'Cold Email', 'Cold Call', 'Référence', 'Événement'] },
+];
 
 export function getDealRottingStatus(lastContactDate) {
     if (!lastContactDate) return { color: 'text-slate-500', icon: Clock, label: 'Nouveau' };

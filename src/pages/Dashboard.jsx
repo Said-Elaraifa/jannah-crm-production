@@ -202,28 +202,28 @@ export default function Dashboard({ onNewClient, currentUser }) {
     const isExecutive = isAdmin || isCeo;
 
     return (
-        <div className="w-full space-y-6 pb-10 animate-fade-in">
+        <div className="w-full space-y-8 pb-10 animate-fade-in">
             {/* Header Area */}
-            <div className="relative mb-6">
+            <div className="relative mb-8 z-10 w-full">
                 <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-accent/20 blur-[120px] rounded-full mix-blend-screen pointer-events-none -translate-y-1/2 animate-pulse-glow" />
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10 w-full">
                     <div>
                         <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-accent/10 border border-accent/20 rounded-full text-[10px] md:text-xs font-black uppercase tracking-widest text-accent mb-6 shadow-[0_0_15px_rgba(238,180,23,0.2)]">
                             <Activity size={12} className="animate-pulse" /> Vue d'ensemble
                         </div>
-                        <h1 className="text-3xl md:text-4xl font-display font-black tracking-tight mb-2 text-slate-900 dark:text-white">
+                        <h1 className="text-4xl md:text-5xl font-display font-black tracking-tight mb-4 text-slate-900 dark:text-white flex flex-wrap items-center gap-4">
                             {isSales ? 'Sales' : isTech ? 'Tech' : 'CEO'} <span className="text-accent underline decoration-accent/30 underline-offset-8">Dashboard</span>
                         </h1>
-                        <p className="text-slate-600 dark:text-slate-400 max-w-2xl text-sm md:text-base leading-relaxed font-medium mt-2">
+                        <p className="text-slate-500 dark:text-slate-400 max-w-2xl text-base md:text-lg leading-relaxed font-medium mt-4">
                             Bienvenue {currentUser?.name}, voici l'état en temps réel de vos opérations et KPIs.
                         </p>
                     </div>
-                    <div className="flex items-center gap-4">
+                    <div className="flex flex-col sm:flex-row items-center gap-4">
                         {isAdmin && (
                             <button
                                 onClick={handleExportPDF}
                                 disabled={isExporting}
-                                className="flex items-center gap-2 px-6 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-900 dark:text-white text-[10px] md:text-xs font-black uppercase tracking-widest rounded-xl transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="flex items-center gap-2 px-6 py-3.5 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-900 dark:text-white text-[10px] md:text-xs font-black uppercase tracking-widest rounded-xl transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                             >
                                 {isExporting ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
                                 {isExporting ? 'Génération...' : 'Export PDF'}
@@ -232,9 +232,9 @@ export default function Dashboard({ onNewClient, currentUser }) {
                         {(isAdmin || isSales) && (
                             <button
                                 onClick={onNewClient}
-                                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-accent to-yellow-500 hover:from-yellow-400 hover:to-yellow-300 text-bg-dark text-[10px] md:text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-[0_0_20px_rgba(238,180,23,0.3)] active:scale-95"
+                                className="flex items-center gap-2 px-6 py-3.5 bg-gradient-to-r from-accent to-yellow-500 hover:from-yellow-400 hover:to-yellow-300 text-bg-dark text-[10px] md:text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-[0_0_20px_rgba(238,180,23,0.3)] active:scale-95 whitespace-nowrap"
                             >
-                                <Plus size={16} /> CLIENT
+                                <Plus size={16} strokeWidth={3} /> CLIENT
                             </button>
                         )}
                     </div>
@@ -250,9 +250,9 @@ export default function Dashboard({ onNewClient, currentUser }) {
             {isExecutive && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Revenue Chart */}
-                    <div className="lg:col-span-2 bg-surface-dark/40 backdrop-blur-xl rounded-3xl border border-slate-200 dark:border-white/10 p-5 shadow-[0_8px_32px_rgba(0,0,0,0.1)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)] relative overflow-hidden">
+                    <div className="lg:col-span-2 bg-white dark:bg-surface-dark/40 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-white/10 p-6 shadow-sm relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-64 h-64 bg-accent/5 blur-[80px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-                        <div className="flex justify-between items-center mb-6">
+                        <div className="flex justify-between items-center mb-6 relative z-10">
                             <h3 className="text-base md:text-lg font-bold text-slate-900 dark:text-white">Revenus vs Ads</h3>
                             <CustomSelect
                                 value="Derniers 8 mois"
@@ -264,13 +264,13 @@ export default function Dashboard({ onNewClient, currentUser }) {
                                 className="!w-40 text-xs"
                             />
                         </div>
-                        <div className="relative h-56">
+                        <div className="relative h-56 z-10">
                             <canvas ref={chartRef} />
                         </div>
                     </div>
 
                     {/* Activity Feed */}
-                    <div className="bg-surface-dark/40 backdrop-blur-xl rounded-3xl border border-slate-200 dark:border-white/10 p-5 shadow-[0_8px_32px_rgba(0,0,0,0.1)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)] flex flex-col relative overflow-hidden">
+                    <div className="bg-white dark:bg-surface-dark/40 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-white/10 p-6 shadow-sm flex flex-col relative overflow-hidden">
                         <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary/10 blur-[80px] rounded-full translate-y-1/2 -translate-x-1/2 pointer-events-none" />
                         <ActivityFeed />
                     </div>
@@ -279,7 +279,7 @@ export default function Dashboard({ onNewClient, currentUser }) {
 
             {/* Alternative View for Tech/Sales */}
             {(!isExecutive) && (
-                <div className="bg-surface-dark/40 backdrop-blur-xl rounded-[2rem] border border-slate-200 dark:border-white/10 p-8 md:p-12 shadow-[0_8px_32px_rgba(0,0,0,0.1)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.3)] text-center relative overflow-hidden inline-[mx-auto]">
+                <div className="bg-white dark:bg-surface-dark/40 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-white/10 p-8 md:p-12 shadow-sm text-center relative overflow-hidden inline-[mx-auto]">
                     <div className="w-20 h-20 bg-slate-100 dark:bg-white/5 rounded-[2rem] border border-slate-200 dark:border-white/10 flex items-center justify-center mx-auto mb-6 shadow-inner relative z-10">
                         {isSales ? <DollarSign className="text-yellow-500 dark:text-yellow-400" size={32} /> : <Server className="text-blue-500 dark:text-blue-400" size={32} />}
                     </div>

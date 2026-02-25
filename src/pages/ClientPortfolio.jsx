@@ -89,8 +89,8 @@ function formatCurrency(amount) {
     }).format(amount || 0);
 }
 
-export default function ClientPortfolio({ onEditClient, onNewClient }) {
-    const [clients, setClients] = useState([]);
+export default function ClientPortfolio({ clients, onEditClient, onNewClient }) {
+    const [portfolioClients, setPortfolioClients] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -108,13 +108,13 @@ export default function ClientPortfolio({ onEditClient, onNewClient }) {
 
     useEffect(() => {
         loadPortfolio();
-    }, []);
+    }, [clients?.length]);
 
     const loadPortfolio = async () => {
         setIsLoading(true);
         try {
             const data = await fetchClientPortfolio();
-            setClients(data);
+            setPortfolioClients(data);
         } catch (error) {
             console.error('Error loading portfolio:', error);
         } finally {
@@ -133,7 +133,7 @@ export default function ClientPortfolio({ onEditClient, onNewClient }) {
         try {
             await removeClientRecord(clientToDelete.id);
             // Optimistic UI update
-            setClients(clients.filter(c => c.id !== clientToDelete.id));
+            setPortfolioClients(portfolioClients.filter(c => c.id !== clientToDelete.id));
             setIsDeleteModalOpen(false);
             setClientToDelete(null);
         } catch (error) {
@@ -152,7 +152,7 @@ export default function ClientPortfolio({ onEditClient, onNewClient }) {
         await loadPortfolio();
     };
 
-    const filteredClients = clients.filter(client =>
+    const filteredClients = portfolioClients.filter(client =>
         client.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         client.company?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         client.email?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -173,14 +173,14 @@ export default function ClientPortfolio({ onEditClient, onNewClient }) {
             )}
 
             {/* Header Area */}
-            <div className="relative mb-8">
+            <div className="relative mb-8 z-10 w-full flex-shrink-0">
                 <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-primary/10 blur-[120px] rounded-full mix-blend-screen pointer-events-none -translate-y-1/2 animate-pulse-glow" />
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10 w-full">
                     <div>
                         <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-primary/10 border border-primary/20 rounded-full text-[10px] md:text-xs font-black uppercase tracking-widest text-primary mb-6 shadow-[0_0_15px_rgba(34,197,94,0.1)]">
                             <TrendingUp size={12} className="animate-pulse" /> Performance Portfolio
                         </div>
-                        <h1 className="text-4xl md:text-5xl font-display font-black tracking-tight mb-4 text-slate-900 dark:text-white">
+                        <h1 className="text-4xl md:text-5xl font-display font-black tracking-tight mb-4 text-slate-900 dark:text-white flex flex-wrap items-center gap-4">
                             Portefeuille <span className="text-primary underline decoration-primary/30 underline-offset-8">Clients</span>
                         </h1>
                         <p className="text-slate-500 dark:text-slate-400 max-w-2xl text-base md:text-lg leading-relaxed font-medium mt-4">
@@ -200,7 +200,7 @@ export default function ClientPortfolio({ onEditClient, onNewClient }) {
             </div>
 
             {/* Toolbar */}
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-white dark:bg-slate-900/40 backdrop-blur-xl p-3 rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm w-full">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4 bg-white dark:bg-surface-dark/40 backdrop-blur-xl p-4 rounded-2xl border border-slate-200 dark:border-white/10 shadow-sm w-full">
                 <div className="relative w-full md:max-w-md">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                     <input
@@ -208,7 +208,7 @@ export default function ClientPortfolio({ onEditClient, onNewClient }) {
                         placeholder="Rechercher un client, une entreprise..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl py-2.5 pl-11 pr-4 text-sm focus:outline-none focus:border-primary/50 transition-all text-slate-900 dark:text-white placeholder:text-slate-400"
+                        className="w-full bg-slate-50 dark:bg-black/40 border border-slate-200 dark:border-white/10 rounded-xl py-3 pl-11 pr-4 text-sm focus:outline-none focus:border-primary/50 transition-all text-slate-900 dark:text-white placeholder:text-slate-400"
                     />
                 </div>
 
@@ -218,7 +218,7 @@ export default function ClientPortfolio({ onEditClient, onNewClient }) {
             </div>
 
             {/* Data Table */}
-            <div className="bg-white dark:bg-slate-900/40 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-white/5 shadow-xl w-full overflow-hidden">
+            <div className="bg-white dark:bg-surface-dark/40 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-white/10 shadow-sm w-full overflow-hidden">
                 <div className="overflow-x-auto w-full">
                     <table className="w-full text-left border-collapse min-w-[800px]">
                         <thead>

@@ -35,7 +35,7 @@ export default function Login() {
             <div className="w-full max-w-md relative z-10">
                 <div className="text-center mb-12 animate-fade-in-up">
                     <div className="flex justify-center mb-6">
-                        <JannahLogoWithBadge height={45} badge="OS1.0" />
+                        <JannahLogoWithBadge height={45} badge="OS 1.5" />
                     </div>
                     <h1 className="text-3xl font-display font-black text-white tracking-tight mb-3">Content de vous revoir</h1>
                     <p className="text-slate-400 text-sm font-medium">Connectez-vous à votre poste de commande Jannah.</p>
@@ -102,7 +102,7 @@ export default function Login() {
                 </div>
 
                 <div className="mt-8 text-center animate-fade-in" style={{ animationDelay: '0.4s' }}>
-                    <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">© {new Date().getFullYear()} Jannah Agency OS1.0 — Tous droits réservés</p>
+                    <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest">© {new Date().getFullYear()} Jannah Agency OS 1.5 — Tous droits réservés</p>
                 </div>
             </div>
         </div>

@@ -157,7 +157,7 @@ export default function App() {
       case 'Billing':
         return <BillingView />;
       case 'Portfolio':
-        return <ClientPortfolio onEditClient={editClient} onNewClient={handleNewClient} />;
+        return <ClientPortfolio clients={clients} onEditClient={editClient} onNewClient={handleNewClient} />;
       case 'Clients':
         return (
           <ClientsProjects
@@ -219,7 +219,7 @@ export default function App() {
       ) : !session ? (
         <Login />
       ) : (
-        <div className="flex min-h-screen bg-white dark:bg-bg-dark text-slate-900 dark:text-white font-body transition-colors duration-300 overflow-x-hidden">
+        <div className="flex min-h-screen bg-white dark:bg-bg-dark text-slate-900 dark:text-white font-body transition-colors duration-300 overflow-x-hidden md:pl-64">
           <Sidebar
             activeTab={activeTab}
             setActiveTab={setActiveTab}

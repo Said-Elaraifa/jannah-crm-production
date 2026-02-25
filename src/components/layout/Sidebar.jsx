@@ -77,11 +77,11 @@ export default function Sidebar({ activeTab, setActiveTab, isOpen, onClose, curr
         bg-surface-dark border-r border-slate-200 dark:border-white/5
         transition-transform duration-300
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-        md:translate-x-0 md:sticky md:top-0 md:h-screen
+        md:translate-x-0 md:fixed md:top-0 md:h-screen
       `}>
                 {/* Logo */}
                 <div className="h-16 flex items-center justify-between px-5 border-b border-slate-200 dark:border-white/5 flex-shrink-0">
-                    <JannahLogoWithBadge height={32} badge="OS1.0" />
+                    <JannahLogoWithBadge height={32} badge="OS 1.5" />
                     <button onClick={onClose} className="md:hidden text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white p-1 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-colors">
                         <X size={20} />
                     </button>
