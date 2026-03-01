@@ -48,16 +48,23 @@
    BASE STYLES
    ============================================ */
 html {
-  /* Automatically managed color scheme */
+  overflow-x: hidden;
+  /* iOS Safe Area support */
+  padding-top: env(safe-area-inset-top);
 }
 
 body {
+  overflow-x: hidden;
   background-color: var(--bg-main);
   color: var(--color-surface-darker);
   /* Fallback */
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* iOS momentum scroll */
+  -webkit-overflow-scrolling: touch;
+  /* bottom padding for home bar */
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .dark body {

@@ -191,8 +191,29 @@ export async function generateLovablePrompt(cahierDesChargesData) {
         budget: cahierDesChargesData.budget || 'Standard',
         deadline: cahierDesChargesData.deadline || '2-3 semaines',
         info: cahierDesChargesData.additionalInfo || cahierDesChargesData.additional_info || 'Aucune',
-        content: (cahierDesChargesData.hasContent || cahierDesChargesData.has_content) ? 'Oui' : 'Non'
+        content: (cahierDesChargesData.hasContent || cahierDesChargesData.has_content) ? 'Oui' : 'Non',
+        // Social media & links
+        websiteUrl: cahierDesChargesData.websiteUrl || cahierDesChargesData.website_url || null,
+        facebook: cahierDesChargesData.socialFacebook || cahierDesChargesData.social_facebook || null,
+        instagram: cahierDesChargesData.socialInstagram || cahierDesChargesData.social_instagram || null,
+        linkedin: cahierDesChargesData.socialLinkedin || cahierDesChargesData.social_linkedin || null,
+        tiktok: cahierDesChargesData.socialTiktok || cahierDesChargesData.social_tiktok || null,
+        youtube: cahierDesChargesData.socialYoutube || cahierDesChargesData.social_youtube || null,
+        twitter: cahierDesChargesData.socialTwitter || cahierDesChargesData.social_twitter || null,
+        otherLinks: cahierDesChargesData.otherLinks || cahierDesChargesData.other_links || null,
     };
+
+    // Build social links string only for non-empty values
+    const socialLines = [
+        d.websiteUrl && `Site web actuel : ${d.websiteUrl}`,
+        d.facebook && `Facebook : ${d.facebook}`,
+        d.instagram && `Instagram : ${d.instagram}`,
+        d.linkedin && `LinkedIn : ${d.linkedin}`,
+        d.tiktok && `TikTok : ${d.tiktok}`,
+        d.youtube && `YouTube : ${d.youtube}`,
+        d.twitter && `X/Twitter : ${d.twitter}`,
+        d.otherLinks && `Autres liens : ${d.otherLinks}`,
+    ].filter(Boolean).join('\n');
 
     const dataDescription = `
 Entreprise : ${d.company}
@@ -205,26 +226,37 @@ Public cible : ${d.target}
 Concurrents : ${d.competitors}
 Info supp : ${d.info}
 Contenu fourni : ${d.content}
+${socialLines ? `\nPrésence en ligne actuelle (liens réels à intégrer dans le site) :\n${socialLines}` : ''}
 `;
 
-    const prompt = `Tu es un expert en vibe coding with Lovable (plateforme de création de sites web IA). 
+    const prompt = `Tu es un DA (Directeur Artistique) expert en design web premium et un spécialiste du vibe coding sur Lovable (plateforme de création de sites web IA).
     
-Génère un prompt COMPLET et DÉTAILLÉ pour créer un site web professionnel sur Lovable.dev en utilisant les informations suivantes du cahier des charges :
+Génère un prompt de conception COMPLET, DÉTAILLÉ et hautement conceptuel pour construire le site web du client sur Lovable.dev, en combinant les besoins techniques du cahier des charges avec une narration émotionnelle poussée :
 
 ${dataDescription}
 
-Le prompt doit :
-1. Commencer par "Crée un site web [type] pour [entreprise]..."
-2. Décrire précisément le design visuel (couleurs, typographie, style)
-3. Lister toutes les sections/pages nécessaires
-4. Décrire les fonctionnalités interactives
-5. Inclure des instructions pour le responsive design
-6. Mentionner les animations et micro-interactions souhaitées
-7. Être en français, clair et directement utilisable dans Lovable
+INSTRUCTIONS DE GÉNÉRATION DU PROMPT :
+
+1. CHOIX DU STYLE (IMPORTANT) : Sélectionne de manière ALÉATOIRE, ou selon la nature du projet, un style de design spécifique (ex: Neobrutalist, Swiss/International, Editorial, Glassmorphism, Bauhaus, Art Deco, Minimal, Flat, Material, Neumorphic, Monochromatic, Scandinavian, Japandi, Dark Mode First, Organic/Fluid, Tech Forward, Luxury Minimal, Kinetic, Gradient Modern, Typography First, etc.). Varie toujours tes choix.
+
+2. STRUCTURE : Ton prompt généré doit faire EXACTEMENT TROIS PARAGRAPHES et fusionner l'exigence fonctionnelle avec la direction artistique :
+
+Paragraphe 1 (Concept et Atmosphère) :
+Commence par "Crée un site web (type: ${d.type}) pour l'entreprise ${d.company}...".
+Si le projet est de type "Landing page" ou d'une seule page, insiste vivement sur une expérience de défilement (scroll) unique, cohésive et unifiée. Si c'est un site multi-pages, exige une cohérence esthétique parfaite entre les différentes vues (pages). 
+Énonce le style de design priorisé. Décris les qualités émotionnelles : quelle humeur la cible (${d.target}) doit-elle ressentir ? Comment la hiérarchie visuelle doit-elle diriger cette émotion ? Donne des directives quant à la palette de couleurs (${d.colors}) pour accentuer cette immersion.
+
+Paragraphe 2 (Philosophie UX & Technique) :
+Explique la philosophie du design par le prisme expérientiel. Comment la typographie doit-elle dicter le ton (souveraine, douce, brute) ? Quelles sensations les interactions et micro-animations doivent-elles transmettre (fluides, organiques, directes) ? Décris l'arc émotionnel de l'utilisateur jusqu'à son appel à l'action.
+IMPORTANT : C'est dans ce paragraphe que tu dois lister et intégrer avec génie les sections attendues et les fonctionnalités interactives requises (${d.features}) pour que l'IA de Lovable sache exactement quoi coder à l'écran.
+
+Paragraphe 3 (Références Abstraites & Architecture) :
+Fournis des points de référence abstraits : l'ambiance d'espaces réels, des mouvements artistiques, ou l'essence de lieux premium. Explique comment ces références immatérielles forgent le rendu final.
+Termine par l'instruction stricte d'exiger de l'IA un "responsive design" parfait sur mobile et tablette.
 
 ${LOVABLE_SEO_ADDON}
 
-Génère UNIQUEMENT le prompt, sans explication ni introduction. Le prompt doit être prêt à être copié-collé dans Lovable.`;
+Génère UNIQUEMENT ce prompt final résultant (tes paragraphes + les directives SEO à la fin), sans AUCUNE introduction ni conclusion, prêt à être exécuté. Le texte doit impérativement être en français.`;
 
     let lastError = null;
     let hadQuotaError = false;

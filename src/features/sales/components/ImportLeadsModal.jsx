@@ -73,7 +73,7 @@ export function ImportLeadsModal({ isOpen, onClose, onImport }) {
     const handleImport = async () => {
         setImporting(true);
         try {
-            const count = onImport(parsedRows);
+            const count = await onImport(parsedRows);
             setResult(`${count} leads importés avec succès !`);
             setParsedRows([]);
             setFileName('');

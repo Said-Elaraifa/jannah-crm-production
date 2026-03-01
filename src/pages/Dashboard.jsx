@@ -1,26 +1,69 @@
-// src/pages/Dashboard.jsx
-import { useState, useEffect, useRef } from 'react';
-import { Chart, registerables } from 'chart.js';
-import { Download, Plus, TrendingUp, TrendingDown, Zap, Loader2, DollarSign, Users, Server, Activity, ShieldAlert } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Chart as ChartJS, registerables } from 'chart.js';
+import { Line, Doughnut, Bar } from 'react-chartjs-2';
+import { Download, Plus, ChevronRight, MoreHorizontal, CheckCircle2, Circle, DollarSign, Server, Activity, ShieldAlert, Users, Calendar, Zap, Loader2 } from 'lucide-react';
 import { exportDashboardToPDF } from '../utils/pdfExport';
-import { getKpisData, getRevenueData, getActivityLogs } from '../services/supabase';
 
-Chart.register(...registerables);
-
-import { DashboardStatCard } from '../features/dashboard/components/DashboardStatCard';
-import { ActivityFeed } from '../features/admin/components/ActivityFeed';
+ChartJS.register(...registerables);
 import { CustomSelect } from '../components/ui/CustomSelect';
 
-export default function Dashboard({ onNewClient, currentUser }) {
-    const chartRef = useRef(null);
-    const chartInstance = useRef(null);
-    const [isExporting, setIsExporting] = useState(false);
+// ─── DUMMY DATA FOR CEO DASHBOARD ──────────────────────────────────────────────
+const recentLeads = [];
 
-    // Data States
-    const [kpis, setKpis] = useState([]);
-    const [chartData, setChartData] = useState(null);
-    const [activities, setActivities] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
+const myTasks = [];
+
+// ─── MINI SPARKLINE COMPONENT ─────────────────────────────────────────────────
+const SparklineCard = ({ title, value, trend, isPositive, chartColor, data }) => {
+    const chartData = {
+        labels: ['1', '2', '3', '4', '5', '6', '7', '8'],
+        datasets: [{
+            data,
+            borderColor: chartColor,
+            borderWidth: 2,
+            tension: 0.4,
+            pointRadius: 0,
+            fill: true,
+            backgroundColor: (context) => {
+                const ctx = context.chart.ctx;
+                const gradient = ctx.createLinearGradient(0, 0, 0, 80);
+                gradient.addColorStop(0, `${chartColor}40`);
+                gradient.addColorStop(1, `${chartColor}00`);
+                return gradient;
+            }
+        }]
+    };
+    const options = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+        scales: { x: { display: false }, y: { display: false, min: Math.min(...data) * 0.8 } }
+    };
+
+    return (
+        <div className="bg-white dark:bg-surface-dark/40 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-white/10 p-5 shadow-sm flex flex-col justify-between hover:border-white/20 transition-all group">
+            <div className="flex justify-between items-start mb-6">
+                <div>
+                    <h3 className="text-[13px] font-bold text-slate-500 dark:text-slate-400 mb-1">{title}</h3>
+                    <p className="text-3xl font-display font-black text-slate-900 dark:text-white tracking-tight">{value}</p>
+                </div>
+                <div className={`flex items-center gap-1 text-[11px] font-black px-2 py-1 rounded-full ${isPositive ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400'}`}>
+                    {isPositive ? '↑' : '↓'} {trend}
+                </div>
+            </div>
+            <div className="h-16 w-full relative">
+                <Line data={chartData} options={options} />
+            </div>
+            <div className="mt-4 pt-4 border-t border-slate-100 dark:border-white/5 flex items-center justify-between cursor-pointer group-hover:text-accent transition-colors">
+                <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 group-hover:text-inherit">See more details</span>
+                <ChevronRight size={14} className="text-slate-400 group-hover:text-inherit" />
+            </div>
+        </div>
+    );
+};
+
+
+export default function Dashboard({ onNewClient, currentUser }) {
+    const [isExporting, setIsExporting] = useState(false);
 
     const handleExportPDF = async () => {
         setIsExporting(true);
@@ -33,177 +76,129 @@ export default function Dashboard({ onNewClient, currentUser }) {
         }
     };
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                // Fetch base data
-                const [kpisData, revenueData, logsData] = await Promise.all([
-                    getKpisData(),
-                    getRevenueData(),
-                    getActivityLogs()
-                ]);
-
-                // CUSTOMIZE DATA BASED ON ROLE
-                if (currentUser?.roleId === 'sales') {
-                    // Sales View Data Override
-                    setKpis([
-                        { id: 1, label: "Mon Pipeline", value: "12,500€", change: "+8%", trend: "up", color: "text-green-400", bg_color: "bg-green-500/10", icon: DollarSign },
-                        { id: 2, label: "Deals Gagnés", value: "4", change: "+1", trend: "up", color: "text-accent", bg_color: "bg-accent/10", icon: Users },
-                        { id: 3, label: "Commissions (Est.)", value: "1,250€", change: "+150€", trend: "up", color: "text-yellow-400", bg_color: "bg-yellow-500/10", icon: DollarSign },
-                        { id: 4, label: "Taux de Closing", value: "28%", change: "+2%", trend: "up", color: "text-blue-400", bg_color: "bg-blue-500/10", icon: Activity },
-                    ]);
-                } else if (currentUser?.roleId === 'tech') {
-                    // Tech View Data Override
-                    setKpis([
-                        { id: 1, label: "System Uptime", value: "99.99%", change: "stable", trend: "up", color: "text-green-400", bg_color: "bg-green-500/10", icon: Server },
-                        { id: 2, label: "Open Tickets", value: "5", change: "-2", trend: "down", color: "text-blue-400", bg_color: "bg-blue-500/10", icon: Activity },
-                        { id: 3, label: "Avg Response Time", value: "12m", change: "-5m", trend: "down", color: "text-green-400", bg_color: "bg-green-500/10", icon: Zap },
-                        { id: 4, label: "Critical Alerts", value: "0", change: "stable", trend: "up", color: "text-slate-400", bg_color: "bg-slate-500/10", icon: ShieldAlert },
-                    ]);
-                } else {
-                    // Admin/CEO Default View
-                    setKpis(kpisData || []);
-                }
-
-                setActivities(logsData || []);
-
-                // Transform Revenue Data for Chart (Only for Admin/CEO)
-                if (revenueData && revenueData.length > 0) {
-                    setChartData({
-                        labels: revenueData.map(d => d.month),
-                        revenue: revenueData.map(d => d.revenue),
-                        ads: revenueData.map(d => d.ads)
-                    });
-                }
-            } catch (error) {
-                console.error("Error fetching dashboard data:", error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchData();
-    }, [currentUser]); // Re-fetch when user changes
-
-    // Chart Logic (Only render if chartData exists and Role is Admin/CEO)
-    useEffect(() => {
-        if (!chartRef.current || !chartData || (currentUser?.roleId !== 'admin' && currentUser?.roleId !== 'ceo')) return;
-
-        if (chartInstance.current) {
-            chartInstance.current.destroy();
-        }
-
-        const ctx = chartRef.current.getContext('2d');
-        const gradientRevenue = ctx.createLinearGradient(0, 0, 0, 300);
-        gradientRevenue.addColorStop(0, 'rgba(195, 220, 127, 0.35)');
-        gradientRevenue.addColorStop(1, 'rgba(195, 220, 127, 0.0)');
-
-        const gradientAds = ctx.createLinearGradient(0, 0, 0, 300);
-        gradientAds.addColorStop(0, 'rgba(238, 180, 23, 0.3)');
-        gradientAds.addColorStop(1, 'rgba(238, 180, 23, 0.0)');
-
-        chartInstance.current = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: chartData.labels,
-                datasets: [
-                    {
-                        label: 'Revenus',
-                        data: chartData.revenue,
-                        borderColor: '#c3dc7f',
-                        backgroundColor: gradientRevenue,
-                        borderWidth: 2.5,
-                        pointBackgroundColor: '#c3dc7f',
-                        pointBorderColor: '#1c3144',
-                        pointBorderWidth: 2,
-                        pointRadius: 4,
-                        pointHoverRadius: 6,
-                        tension: 0.4,
-                        fill: true,
-                    },
-                    {
-                        label: 'Dépenses Ads',
-                        data: chartData.ads,
-                        borderColor: '#eeb417',
-                        backgroundColor: gradientAds,
-                        borderWidth: 2.5,
-                        pointBackgroundColor: '#eeb417',
-                        pointBorderColor: '#1c3144',
-                        pointBorderWidth: 2,
-                        pointRadius: 4,
-                        pointHoverRadius: 6,
-                        tension: 0.4,
-                        fill: true,
-                    },
-                ],
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top',
-                        align: 'end',
-                        labels: {
-                            color: '#94a3b8',
-                            font: { family: "'Montserrat', sans-serif", size: 11 },
-                            usePointStyle: true,
-                            boxWidth: 8,
-                            padding: 16,
-                        },
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(28, 49, 68, 0.95)',
-                        titleColor: '#ffffff',
-                        bodyColor: '#cbd5e1',
-                        borderColor: 'rgba(255,255,255,0.08)',
-                        borderWidth: 1,
-                        padding: 12,
-                        callbacks: {
-                            label: (ctx) => ` ${ctx.dataset.label}: ${(ctx.raw / 1000).toFixed(0)}k€`,
-                        },
-                    },
-                },
-                scales: {
-                    y: {
-                        grid: { color: 'rgba(255, 255, 255, 0.04)', drawBorder: false },
-                        ticks: {
-                            color: '#475569',
-                            font: { size: 10 },
-                            callback: (v) => `${v / 1000}k€`,
-                        },
-                        border: { display: false },
-                    },
-                    x: {
-                        grid: { display: false },
-                        ticks: { color: '#475569', font: { size: 10 } },
-                        border: { display: false },
-                    },
-                },
-            },
-        });
-
-        return () => { chartInstance.current?.destroy(); };
-    }, [chartData, currentUser]);
-
-    if (isLoading) {
-        return (
-            <div className="flex h-full items-center justify-center">
-                <Loader2 className="w-8 h-8 text-primary animate-spin" />
-            </div>
-        );
-    }
-
-    const isAdmin = currentUser?.roleId === 'admin';
-    const isCeo = currentUser?.roleId === 'ceo';
-    const isSales = currentUser?.roleId === 'sales';
-    const isTech = currentUser?.roleId === 'tech';
+    const isAdmin = currentUser?.roleId === 'admin' || currentUser?.role?.includes('COO') || currentUser?.role?.includes('Admin');
+    const isCeo = currentUser?.roleId === 'ceo' || currentUser?.role?.includes('CEO');
+    const isSales = currentUser?.roleId === 'sales' || currentUser?.role?.includes('Sales');
+    const isTech = currentUser?.roleId === 'tech' || currentUser?.role?.includes('Dev');
     const isExecutive = isAdmin || isCeo;
 
+    // ─── CHARTS CONFIGS FOR CEO ────────────────────────────────────────────────
+    const oppSummaryData = {
+        labels: ['11 Dec', '12 Dec', '13 Dec', '14 Dec', '15 Dec', '16 Dec', '17 Dec', '18 Dec', '19 Dec'],
+        datasets: [
+            {
+                label: 'Closed Won',
+                data: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                borderColor: '#3B82F6', // Blue
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                borderWidth: 2.5,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: '#3B82F6',
+                pointRadius: 0,
+                pointHoverRadius: 6,
+            },
+            {
+                label: 'Closed Lose',
+                data: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                borderColor: '#A855F7', // Purple
+                backgroundColor: 'rgba(168, 85, 247, 0.1)',
+                borderWidth: 2.5,
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: '#A855F7',
+                pointRadius: 0,
+                pointHoverRadius: 6,
+            }
+        ]
+    };
+
+    const oppSummaryOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                titleColor: '#fff',
+                bodyColor: '#cbd5e1',
+                padding: 12,
+                borderColor: 'rgba(255,255,255,0.1)',
+                borderWidth: 1,
+            }
+        },
+        scales: {
+            x: {
+                grid: { display: false, drawBorder: false },
+                ticks: { color: '#64748b', font: { size: 11 } }
+            },
+            y: {
+                grid: { color: 'rgba(255, 255, 255, 0.05)', borderDash: [5, 5], drawBorder: false },
+                ticks: {
+                    color: '#64748b',
+                    font: { size: 11 },
+                    callback: (val) => val >= 1000 ? `${(val / 1000).toFixed(0)}k` : val
+                },
+                min: 0,
+                max: 4000
+            }
+        }
+    };
+
+    const statusDoughnutData = {
+        labels: ['Aucune donnée'],
+        datasets: [{
+            data: [1],
+            backgroundColor: ['#334155'],
+            borderWidth: 0,
+            circumference: 180,
+            rotation: 270,
+            cutout: '75%',
+            borderRadius: 5
+        }]
+    };
+    const statusDoughnutOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { enabled: true } }
+    };
+
+    const salesBarData = {
+        labels: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+        datasets: [{
+            label: 'Sales',
+            data: [0, 0, 0, 0, 0, 0],
+            backgroundColor: (context) => {
+                const ctx = context.chart.ctx;
+                const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+                gradient.addColorStop(0, '#A855F7');
+                gradient.addColorStop(1, '#A855F740');
+                return gradient;
+            },
+            borderRadius: 6,
+            barThickness: 24,
+        }]
+    };
+
+    const salesBarOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { grid: { display: false, drawBorder: false }, ticks: { color: '#64748b' } },
+            y: {
+                grid: { color: 'rgba(255, 255, 255, 0.05)', borderDash: [5, 5], drawBorder: false },
+                ticks: { color: '#64748b', callback: (val) => `$${val}` },
+                min: 0,
+                max: 150
+            }
+        }
+    };
+
     return (
-        <div className="w-full space-y-8 pb-10 animate-fade-in">
-            {/* Header Area */}
+        <div className="w-full space-y-6 pb-10 animate-fade-in">
+            {/* ─── HEADER AREA ─────────────────────────────────────────────────── */}
             <div className="relative mb-8 z-10 w-full">
                 <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-accent/20 blur-[120px] rounded-full mix-blend-screen pointer-events-none -translate-y-1/2 animate-pulse-glow" />
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10 w-full">
@@ -212,73 +207,205 @@ export default function Dashboard({ onNewClient, currentUser }) {
                             <Activity size={12} className="animate-pulse" /> Vue d'ensemble
                         </div>
                         <h1 className="text-4xl md:text-5xl font-display font-black tracking-tight mb-4 text-slate-900 dark:text-white flex flex-wrap items-center gap-4">
-                            {isSales ? 'Sales' : isTech ? 'Tech' : 'CEO'} <span className="text-accent underline decoration-accent/30 underline-offset-8">Dashboard</span>
+                            CEO <span className="text-accent underline decoration-accent/30 underline-offset-8">Dashboard</span>
                         </h1>
                         <p className="text-slate-500 dark:text-slate-400 max-w-2xl text-base md:text-lg leading-relaxed font-medium mt-4">
-                            Bienvenue {currentUser?.name}, voici l'état en temps réel de vos opérations et KPIs.
+                            Bienvenue {currentUser?.name || 'Saïd'}, voici l'état en temps réel de vos opérations et KPIs.
                         </p>
                     </div>
                     <div className="flex flex-col sm:flex-row items-center gap-4">
+                        <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-300">
+                            <Calendar size={14} /> Dernière mise à jour: <span className="text-blue-400">
+                                {new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })}
+                            </span>
+                        </div>
                         {isAdmin && (
                             <button
                                 onClick={handleExportPDF}
                                 disabled={isExporting}
-                                className="flex items-center gap-2 px-6 py-3.5 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-900 dark:text-white text-[10px] md:text-xs font-black uppercase tracking-widest rounded-xl transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                                className="flex items-center gap-2 px-6 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-900 dark:text-white text-[10px] md:text-xs font-black uppercase tracking-widest rounded-xl transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                             >
                                 {isExporting ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
-                                {isExporting ? 'Génération...' : 'Export PDF'}
+                                Import or Export
                             </button>
                         )}
                         {(isAdmin || isSales) && (
                             <button
                                 onClick={onNewClient}
-                                className="flex items-center gap-2 px-6 py-3.5 bg-gradient-to-r from-accent to-yellow-500 hover:from-yellow-400 hover:to-yellow-300 text-bg-dark text-[10px] md:text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-[0_0_20px_rgba(238,180,23,0.3)] active:scale-95 whitespace-nowrap"
+                                className="flex items-center justify-center w-10 h-10 bg-green-500 hover:bg-green-400 text-white rounded-xl transition-all shadow-[0_0_20px_rgba(34,197,94,0.3)] active:scale-95"
                             >
-                                <Plus size={16} strokeWidth={3} /> CLIENT
+                                <Plus size={20} className="stroke-[3px]" />
                             </button>
                         )}
                     </div>
                 </div>
             </div>
 
-            {/* KPI Cards */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                {kpis.map(kpi => <DashboardStatCard key={kpi.id} kpi={kpi} />)}
-            </div>
+            {/* ─── EXECUTIVE DASHBOARD GRID ───────────────────────────────────── */}
+            {isExecutive ? (
+                <div className="flex flex-col gap-6">
+                    {/* TOP CARDS ROW */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <SparklineCard title="Total Leads" value="0" trend="0%" isPositive={true} chartColor="#64748b" data={[0, 0, 0, 0, 0, 0, 0, 0]} />
+                        <SparklineCard title="Total Opportunity" value="0" trend="0%" isPositive={true} chartColor="#64748b" data={[0, 0, 0, 0, 0, 0, 0, 0]} />
+                        <SparklineCard title="Total Sales" value="0€" trend="0%" isPositive={true} chartColor="#64748b" data={[0, 0, 0, 0, 0, 0, 0, 0]} />
+                    </div>
 
-            {/* Charts Row (Only for Admin/CEO) */}
-            {isExecutive && (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Revenue Chart */}
-                    <div className="lg:col-span-2 bg-white dark:bg-surface-dark/40 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-white/10 p-6 shadow-sm relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-accent/5 blur-[80px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-                        <div className="flex justify-between items-center mb-6 relative z-10">
-                            <h3 className="text-base md:text-lg font-bold text-slate-900 dark:text-white">Revenus vs Ads</h3>
-                            <CustomSelect
-                                value="Derniers 8 mois"
-                                onChange={() => { }}
-                                options={[
-                                    { value: 'Derniers 8 mois', label: 'Derniers 8 mois' },
-                                    { value: 'Cette année', label: 'Cette année' }
-                                ]}
-                                className="!w-40 text-xs"
-                            />
+                    {/* MIDDLE ROW */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                        {/* OPPRTUNITY SUMMARY CHART */}
+                        <div className="lg:col-span-2 bg-white dark:bg-surface-dark/40 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-white/10 p-6 shadow-sm flex flex-col">
+                            <div className="flex items-start justify-between mb-8">
+                                <div>
+                                    <h3 className="text-base font-bold text-slate-900 dark:text-white">Opportunity Summary</h3>
+                                    <p className="text-[11px] font-bold text-slate-500">Last 9 days</p>
+                                </div>
+                                <div className="flex items-center gap-6">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
+                                        <span className="text-[11px] font-bold text-slate-400">Closed Won</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-2 h-2 rounded-full bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.5)]"></div>
+                                        <span className="text-[11px] font-bold text-slate-400">Closed Lose</span>
+                                    </div>
+                                    <div className="hidden sm:flex items-center gap-2 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 px-3 py-1.5 rounded-xl text-[11px] font-bold text-blue-400">
+                                        <Calendar size={12} /> Date Range: 11 Dec 2024 - 19 Dec 2024
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="h-[280px] w-full mt-auto">
+                                <Line data={oppSummaryData} options={oppSummaryOptions} />
+                            </div>
                         </div>
-                        <div className="relative h-56 z-10">
-                            <canvas ref={chartRef} />
+
+                        {/* RECENT LEADS LIST */}
+                        <div className="bg-white dark:bg-surface-dark/40 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-white/10 p-6 shadow-sm flex flex-col">
+                            <div className="flex items-center justify-between mb-6">
+                                <h3 className="text-base font-bold text-slate-900 dark:text-white">Recent Lead</h3>
+                                <button className="text-slate-400 hover:text-white"><MoreHorizontal size={20} /></button>
+                            </div>
+                            <div className="flex flex-col gap-2 overflow-y-auto pr-2 custom-scrollbar">
+                                {recentLeads.length > 0 ? recentLeads.map((lead, idx) => (
+                                    <div key={idx} className="flex items-center justify-between p-3 rounded-xl hover:bg-white/5 border border-transparent hover:border-white/5 transition-all cursor-pointer group">
+                                        <div className="flex items-center gap-3 min-w-0">
+                                            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${lead.color} flex-shrink-0`}>
+                                                {lead.initial}
+                                            </div>
+                                            <div className="min-w-0">
+                                                <h4 className="text-sm font-bold text-white truncate">{lead.name}</h4>
+                                                <p className="text-[10px] text-slate-400 truncate">
+                                                    <span className="text-blue-400">{lead.email}</span> • {lead.company}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <ChevronRight size={16} className="text-slate-600 group-hover:text-white transition-colors flex-shrink-0" />
+                                    </div>
+                                )) : (
+                                    <div className="flex flex-col items-center justify-center h-48 text-center px-4">
+                                        <div className="w-12 h-12 rounded-full bg-slate-800/50 flex items-center justify-center mb-3">
+                                            <Users size={20} className="text-slate-500" />
+                                        </div>
+                                        <p className="text-sm font-bold text-slate-400">Aucun lead pour le moment</p>
+                                        <p className="text-[11px] text-slate-500 mt-1">Les nouveaux leads apparaîtront ici.</p>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
 
-                    {/* Activity Feed */}
-                    <div className="bg-white dark:bg-surface-dark/40 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-white/10 p-6 shadow-sm flex flex-col relative overflow-hidden">
-                        <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary/10 blur-[80px] rounded-full translate-y-1/2 -translate-x-1/2 pointer-events-none" />
-                        <ActivityFeed />
+                    {/* BOTTOM ROW */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                        {/* LEAD BY STATUS DOUGHNUT */}
+                        <div className="bg-white dark:bg-surface-dark/40 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-white/10 p-6 shadow-sm flex flex-col items-center relative">
+                            <div className="w-full flex items-start justify-between mb-4 absolute top-6 left-6 pr-12">
+                                <h3 className="text-base font-bold text-slate-900 dark:text-white">Lead by Status</h3>
+                                <button className="text-slate-400 hover:text-white"><MoreHorizontal size={20} /></button>
+                            </div>
+                            <div className="w-full flex items-center justify-start mb-8 z-10 pl-6 pt-10">
+                                <span className="text-3xl font-display font-black text-white">0</span>
+                                <span className="ml-2 text-[11px] font-bold text-slate-400 bg-slate-800 px-2 py-0.5 rounded-full">0%</span>
+                            </div>
+
+                            <div className="relative w-full h-[180px] flex items-end justify-center">
+                                <Doughnut data={statusDoughnutData} options={statusDoughnutOptions} />
+                                <div className="absolute bottom-6 flex flex-col items-center">
+                                    <span className="text-4xl font-black text-slate-600">0%</span>
+                                    <span className="text-xs font-bold text-slate-500">Aucune donnée</span>
+                                </div>
+                            </div>
+
+                            <div className="w-full flex justify-center gap-4 mt-8 pb-2">
+                                <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-[#A855F7]" /><span className="text-[10px] font-bold text-slate-400">Closed Won</span></div>
+                                <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-[#3B82F6]" /><span className="text-[10px] font-bold text-slate-400">Closed Lose</span></div>
+                                <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-slate-200" /><span className="text-[10px] font-bold text-slate-400">Contacted</span></div>
+                                <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-slate-100" /><span className="text-[10px] font-bold text-slate-400">New</span></div>
+                            </div>
+                        </div>
+
+                        {/* SALES SUMMARY BAR */}
+                        <div className="bg-white dark:bg-surface-dark/40 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-white/10 p-6 shadow-sm flex flex-col">
+                            <div className="flex items-start justify-between mb-6">
+                                <div>
+                                    <h3 className="text-base font-bold text-slate-900 dark:text-white">Sales Summary</h3>
+                                    <p className="text-[11px] font-bold text-slate-500">Last 6 days</p>
+                                </div>
+                                <div className="flex items-center gap-2 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 px-3 py-1.5 rounded-xl text-[11px] font-bold text-blue-400">
+                                    <Calendar size={12} /> 11/12/2024 - 16/12/2024
+                                </div>
+                            </div>
+                            <div className="h-[200px] w-full mt-auto">
+                                <Bar data={salesBarData} options={salesBarOptions} />
+                            </div>
+                        </div>
+
+                        {/* MY TASK CHECKLIST */}
+                        <div className="bg-white dark:bg-surface-dark/40 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-white/10 p-6 shadow-sm flex flex-col">
+                            <div className="flex items-center justify-between mb-6">
+                                <h3 className="text-base font-bold text-slate-900 dark:text-white">My Task</h3>
+                                <button className="text-slate-400 hover:text-white"><MoreHorizontal size={20} /></button>
+                            </div>
+                            <div className="flex flex-col gap-3 overflow-y-auto custom-scrollbar pr-2 h-[220px]">
+                                {myTasks.length > 0 ? myTasks.map((task, idx) => (
+                                    <div key={idx} className={`p-4 rounded-xl border flex items-start justify-between transition-all ${task.completed ? 'bg-white/5 border-white/5 opacity-60' : 'bg-surface-dark border-white/10 hover:border-white/20'}`}>
+                                        <div className="flex items-start gap-3">
+                                            {task.completed ?
+                                                <CheckCircle2 size={18} className="text-green-400 mt-0.5" /> :
+                                                <Circle size={18} className="text-slate-500 mt-0.5" />
+                                            }
+                                            <div>
+                                                <h4 className={`text-sm tracking-tight font-bold ${task.completed ? 'text-slate-400 line-through' : 'text-white'}`}>{task.title}</h4>
+                                                <div className="flex items-center gap-2 mt-2">
+                                                    <span className="flex items-center gap-1 text-[10px] text-slate-500 font-bold"><Calendar size={10} /> {task.date}</span>
+                                                    <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-md ${task.tagColor}`}>{task.tag}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="flex -space-x-2">
+                                            {task.avatars.length > 0 ? task.avatars.map((_, i) => (
+                                                <div key={i} className="w-6 h-6 rounded-full bg-slate-500/50 border-2 border-surface-dark"></div>
+                                            )) : (
+                                                <div className="w-6 h-6 rounded-full bg-slate-500/10 border-2 border-transparent"></div>
+                                            )}
+                                        </div>
+                                    </div>
+                                )) : (
+                                    <div className="flex flex-col items-center justify-center h-full text-center px-4">
+                                        <div className="w-12 h-12 rounded-full bg-slate-800/50 flex items-center justify-center mb-3">
+                                            <CheckCircle2 size={20} className="text-slate-500" />
+                                        </div>
+                                        <p className="text-sm font-bold text-slate-400">Aucune tâche</p>
+                                        <p className="text-[11px] text-slate-500 mt-1">Vous êtes à jour, profitez-en !</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </div>
-            )}
-
-            {/* Alternative View for Tech/Sales */}
-            {(!isExecutive) && (
+            ) : (
+                /* ─── ALTERNATIVE VIEW FOR SALES/TECH ────────────────────────────── */
                 <div className="bg-white dark:bg-surface-dark/40 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-white/10 p-8 md:p-12 shadow-sm text-center relative overflow-hidden inline-[mx-auto]">
                     <div className="w-20 h-20 bg-slate-100 dark:bg-white/5 rounded-[2rem] border border-slate-200 dark:border-white/10 flex items-center justify-center mx-auto mb-6 shadow-inner relative z-10">
                         {isSales ? <DollarSign className="text-yellow-500 dark:text-yellow-400" size={32} /> : <Server className="text-blue-500 dark:text-blue-400" size={32} />}
@@ -294,3 +421,4 @@ export default function Dashboard({ onNewClient, currentUser }) {
         </div>
     );
 }
+

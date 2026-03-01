@@ -1,17 +1,18 @@
 // src/pages/CahierDesCharges.jsx
 // Public page - no login required, accessible via unique slug
 import { useState, useRef, useEffect } from 'react';
-import { CheckCircle, ChevronRight, ChevronLeft, SkipForward, Upload, Palette, Globe, Zap, Users, FileText, Check, Loader2, ExternalLink } from 'lucide-react';
-import { saveCahier, uploadFile, getClientNameBySlug } from '../services/supabase';
+import { CheckCircle, ChevronRight, ChevronLeft, SkipForward, Upload, Palette, Globe, Zap, Users, FileText, Check, Loader2, ExternalLink, Link2 } from 'lucide-react';
+import { saveCahier, uploadFile, getClientInfoBySlug } from '../services/supabase';
 import { JannahLogoIcon } from '../components/ui/JannahLogo';
 import { CustomSelect } from '../components/ui/CustomSelect';
 
 const STEPS = [
     { id: 1, title: "Votre Entreprise", icon: Users, description: "Parlez-nous de vous" },
-    { id: 2, title: "Votre Projet", icon: Globe, description: "Quel site souhaitez-vous ?" },
-    { id: 3, title: "Design & Style", icon: Palette, description: "Votre identité visuelle" },
-    { id: 4, title: "Fonctionnalités", icon: Zap, description: "Ce dont vous avez besoin" },
-    { id: 5, title: "Contenu & Fichiers", icon: FileText, description: "Vos ressources disponibles" },
+    { id: 2, title: "Présence en ligne", icon: Link2, description: "Vos liens (Optionnel)" },
+    { id: 3, title: "Votre Projet", icon: Globe, description: "Quel site souhaitez-vous ?" },
+    { id: 4, title: "Design & Style", icon: Palette, description: "Votre identité visuelle" },
+    { id: 5, title: "Fonctionnalités", icon: Zap, description: "Ce dont vous avez besoin" },
+    { id: 6, title: "Contenu & Fichiers", icon: FileText, description: "Vos ressources disponibles" },
 ];
 
 const PROJECT_TYPES = ['Site Vitrine', 'E-commerce', 'Landing Page', 'Blog / Magazine', 'Portfolio', 'Application Web'];
@@ -138,12 +139,23 @@ export default function CahierDesCharges({ clientSlug, clientName, onComplete })
     const [charteUrl, setCharteUrl] = useState(null);
     const [contentUrl, setContentUrl] = useState(null);
     const [displayName, setDisplayName] = useState(clientName || clientSlug);
+    const [clientPlan, setClientPlan] = useState('');
 
     const [formData, setFormData] = useState({
         companyName: clientName || '',
         activity: '',
         targetAudience: '',
         competitors: '',
+        // Social media & online presence
+        websiteUrl: '',
+        socialFacebook: '',
+        socialInstagram: '',
+        socialLinkedin: '',
+        socialTiktok: '',
+        socialYoutube: '',
+        socialTwitter: '',
+        otherLinks: '',
+        // Project
         projectType: '',
         projectGoal: '',
         budget: '',
@@ -168,14 +180,15 @@ export default function CahierDesCharges({ clientSlug, clientName, onComplete })
             console.log('[Cahier] Syncing name for:', clientSlug, 'Initial name:', clientName);
             let nameToUse = clientName;
 
-            // If the name is missing or is just the slug, fetch the real name from DB
+            // If the name is missing or is just the slug, fetch the real info from DB
             if (!nameToUse || nameToUse === clientSlug || nameToUse.toLowerCase() === clientSlug.toLowerCase()) {
                 try {
-                    const dbName = await getClientNameBySlug(clientSlug);
-                    console.log('[Cahier] DB Name fetched:', dbName);
-                    if (dbName) nameToUse = dbName;
+                    const dbData = await getClientInfoBySlug(clientSlug);
+                    console.log('[Cahier] DB Info fetched:', dbData);
+                    if (dbData?.name) nameToUse = dbData.name;
+                    if (dbData?.plan) setClientPlan(dbData.plan);
                 } catch (err) {
-                    console.error('[Cahier] Failed to fetch client name:', err);
+                    console.error('[Cahier] Failed to fetch client info:', err);
                 }
             }
 
@@ -193,13 +206,36 @@ export default function CahierDesCharges({ clientSlug, clientName, onComplete })
 
         syncName();
     }, [clientName, clientSlug]);
+    // Extract Max Features according to Plan 79€ (1), 149€ (2), 499€ (3)
+    const maxFeaturesMapping = {
+        'Mini': 1,
+        'Standard': 2,
+        'Pro': 3,
+        'Élite': 100 // fallback
+    };
+
+    // Default to Standard (2) if plan not matching
+    const getMaxFeatures = () => {
+        if (!clientPlan) return 2;
+        const matchedPlan = Object.keys(maxFeaturesMapping).find(k => clientPlan.toLowerCase().includes(k.toLowerCase()));
+        return matchedPlan ? maxFeaturesMapping[matchedPlan] : 2;
+    };
+    const maxFeatures = getMaxFeatures();
+
     const toggleFeature = (feature) => {
-        setFormData(prev => ({
-            ...prev,
-            features: prev.features.includes(feature)
-                ? prev.features.filter(f => f !== feature)
-                : [...prev.features, feature],
-        }));
+        setFormData(prev => {
+            const isSelected = prev.features.includes(feature);
+            if (!isSelected && prev.features.length >= maxFeatures) {
+                // Ignore click if limit reached
+                return prev;
+            }
+            return {
+                ...prev,
+                features: isSelected
+                    ? prev.features.filter(f => f !== feature)
+                    : [...prev.features, feature],
+            };
+        });
     };
 
     const handleFileUpload = async (file, type) => {
@@ -361,8 +397,40 @@ export default function CahierDesCharges({ clientSlug, clientName, onComplete })
                             </div>
                         )}
 
-                        {/* Step 2: Project */}
+                        {/* Step 2: Présence en ligne */}
                         {currentStep === 2 && (
+                            <div className="space-y-1.5 md:space-y-4 animate-fade-in">
+                                <div className="grid grid-cols-1 gap-1.5 md:gap-3">
+                                    {[
+                                        { key: 'websiteUrl', label: 'Site web actuel', placeholder: 'https://monsite.fr', emoji: '🌐' },
+                                        { key: 'socialFacebook', label: 'Facebook', placeholder: 'https://facebook.com/monentreprise', emoji: '📘' },
+                                        { key: 'socialInstagram', label: 'Instagram', placeholder: 'https://instagram.com/monentreprise', emoji: '📸' },
+                                        { key: 'socialLinkedin', label: 'LinkedIn', placeholder: 'https://linkedin.com/company/...', emoji: '💼' },
+                                        { key: 'socialTiktok', label: 'TikTok', placeholder: 'https://tiktok.com/@monentreprise', emoji: '🎵' },
+                                        { key: 'socialYoutube', label: 'YouTube', placeholder: 'https://youtube.com/@monentreprise', emoji: '▶️' },
+                                        { key: 'socialTwitter', label: 'X / Twitter', placeholder: 'https://x.com/monentreprise', emoji: '✖️' },
+                                        { key: 'otherLinks', label: 'Autres liens', placeholder: 'Google My Business, Tripadvisor...', emoji: '🔗' },
+                                    ].map(({ key, label, placeholder, emoji }) => (
+                                        <div key={key} className="flex items-center gap-2">
+                                            <span className="text-base flex-shrink-0 w-5 text-center">{emoji}</span>
+                                            <div className="flex-1">
+                                                <label className="block text-[7px] md:text-[9px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest mb-0.5 ml-1">{label}</label>
+                                                <input
+                                                    type="url"
+                                                    value={formData[key]}
+                                                    onChange={e => update(key, e.target.value)}
+                                                    className="w-full bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white text-[9px] md:text-xs font-bold rounded-lg md:rounded-xl px-2.5 md:px-4 py-1.5 md:py-3 border border-slate-200 dark:border-white/10 focus:border-accent ring-accent/20 focus:ring-2 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600"
+                                                    placeholder={placeholder}
+                                                />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Step 3: Project */}
+                        {currentStep === 3 && (
                             <div className="space-y-2 md:space-y-8 animate-fade-in text-[10px]">
                                 <div>
                                     <label className="block font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1 md:mb-4 ml-1 text-[8px] md:text-[10px]">Type de projet</label>
@@ -384,44 +452,11 @@ export default function CahierDesCharges({ clientSlug, clientName, onComplete })
                                         className="w-full bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white text-[10px] md:text-sm font-bold rounded-lg md:rounded-2xl px-2.5 md:px-5 py-1.5 md:py-5 border border-slate-200 dark:border-white/10 focus:border-accent ring-accent/20 focus:ring-2 outline-none transition-all placeholder:text-slate-400"
                                         placeholder="Ex: Attirer de nouveaux clients..." />
                                 </div>
-                                <div className="grid grid-cols-2 gap-2 md:gap-6">
-                                    <div>
-                                        <label className="block font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-0.5 md:mb-3 ml-1 text-[8px] md:text-[10px]">Budget mensuel</label>
-                                        <CustomSelect
-                                            value={formData.budget}
-                                            onChange={val => update('budget', val)}
-                                            options={[
-                                                { value: '', label: 'Sélectionner...' },
-                                                { value: 'Mini (79€/mo)', label: 'Mini (79€/mo)' },
-                                                { value: 'Standard (149€/mo)', label: 'Standard (149€/mo)' },
-                                                { value: 'Pro (299€/mo)', label: 'Pro (299€/mo)' },
-                                                { value: 'Sur mesure', label: 'Sur mesure' }
-                                            ]}
-                                            className="w-full !bg-slate-50 dark:!bg-white/5 !text-slate-900 dark:!text-white !text-[8px] md:!text-xs !font-black !uppercase !tracking-widest !border-slate-200 dark:!border-white/10 !rounded-lg md:!rounded-2xl !py-1.5 md:!py-4"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-0.5 md:mb-3 ml-1 text-[8px] md:text-[10px]">Délai souhaité</label>
-                                        <CustomSelect
-                                            value={formData.deadline}
-                                            onChange={val => update('deadline', val)}
-                                            options={[
-                                                { value: '', label: 'Sélectionner...' },
-                                                { value: '1 semaine', label: '1 semaine' },
-                                                { value: '2 semaines', label: '2 semaines' },
-                                                { value: '1 mois', label: '1 mois' },
-                                                { value: '2-3 mois', label: '2-3 mois' },
-                                                { value: 'Pas de contrainte', label: 'Pas de contrainte' }
-                                            ]}
-                                            className="w-full !bg-slate-50 dark:!bg-white/5 !text-slate-900 dark:!text-white !text-[8px] md:!text-xs !font-black !uppercase !tracking-widest !border-slate-200 dark:!border-white/10 !rounded-lg md:!rounded-2xl !py-1.5 md:!py-4"
-                                        />
-                                    </div>
-                                </div>
                             </div>
                         )}
 
-                        {/* Step 3: Design */}
-                        {currentStep === 3 && (
+                        {/* Step 4: Design */}
+                        {currentStep === 4 && (
                             <div className="space-y-2 md:space-y-8 animate-fade-in text-[10px]">
                                 <div>
                                     <label className="block font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1 md:mb-4 ml-1 text-[8px] md:text-[10px]">Style visuel souhaité</label>
@@ -436,6 +471,12 @@ export default function CahierDesCharges({ clientSlug, clientName, onComplete })
                                             </button>
                                         ))}
                                     </div>
+                                </div>
+                                <div>
+                                    <label className="block font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-0.5 md:mb-3 ml-1 text-[8px] md:text-[10px]">Vos couleurs (optionnel)</label>
+                                    <input value={formData.colors} onChange={e => update('colors', e.target.value)}
+                                        className="w-full bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white text-[10px] md:text-sm font-bold rounded-lg md:rounded-2xl px-2.5 md:px-5 py-1.5 md:py-5 border border-slate-200 dark:border-white/10 focus:border-accent ring-accent/20 focus:ring-2 outline-none transition-all placeholder:text-slate-400"
+                                        placeholder="Ex: Bleu canard et or, code hex..." />
                                 </div>
                                 <div className="grid grid-cols-2 gap-2 md:gap-6">
                                     <FileUploadZone
@@ -462,11 +503,18 @@ export default function CahierDesCharges({ clientSlug, clientName, onComplete })
                             </div>
                         )}
 
-                        {/* Step 4: Features */}
-                        {currentStep === 4 && (
+                        {/* Step 5: Features */}
+                        {currentStep === 5 && (
                             <div className="space-y-2 md:space-y-8 animate-fade-in text-[10px]">
                                 <div>
-                                    <label className="block font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5 md:mb-6 ml-1 text-center text-[8px] md:text-[10px]">Modules indispensables</label>
+                                    <div className="flex flex-col items-center justify-center mb-1.5 md:mb-6">
+                                        <label className="block font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest text-[8px] md:text-[10px]">Modules indispensables</label>
+                                        <div className="bg-accent/10 px-3 py-1 mt-2 rounded-full border border-accent/20">
+                                            <span className="text-accent text-[8px] md:text-[10px] font-black uppercase tracking-widest">
+                                                Plan {clientPlan || 'Standard'} • Vous pouvez choisir jusqu'à {maxFeatures} modules
+                                            </span>
+                                        </div>
+                                    </div>
                                     <div className="grid grid-cols-2 gap-1.5 md:gap-4">
                                         {FEATURE_OPTIONS.map(feature => (
                                             <FeatureCheckbox
@@ -487,26 +535,29 @@ export default function CahierDesCharges({ clientSlug, clientName, onComplete })
                             </div>
                         )}
 
-                        {/* Step 5: Content & Files */}
-                        {currentStep === 5 && (
+                        {/* Step 6: Content & Files */}
+                        {currentStep === 6 && (
                             <div className="space-y-2 md:space-y-8 animate-fade-in text-[10px]">
-                                <div className="grid grid-cols-2 gap-1.5 md:gap-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-1.5 md:gap-4">
                                     {[
-                                        { key: 'hasContent', label: 'Textes prêts' },
-                                        { key: 'hasImages', label: 'Photos / Images' },
+                                        { key: 'hasContent', label: 'Ai-je les textes prêts ?', desc: 'Slogan, présentation, mentions legales (vous pourrez utiliser l\'IA)' },
+                                        { key: 'hasImages', label: 'Ai-je des photos / visuels ?', desc: 'Photos d\'équipe, produits, locaux (sinon on utilisera des images libres)' },
                                     ].map(item => (
-                                        <label key={item.key} className={`flex items-center gap-2 md:gap-4 p-2.5 md:p-5 rounded-lg md:rounded-2xl border cursor-pointer transition-all ${formData[item.key]
+                                        <label key={item.key} className={`flex items-start md:items-center gap-2 md:gap-4 p-2.5 md:p-5 rounded-lg md:rounded-2xl border cursor-pointer transition-all ${formData[item.key]
                                             ? 'bg-primary/10 border-primary/30 text-primary shadow-sm'
                                             : 'bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-white/20'
                                             }`}>
-                                            <div className={`w-4 h-4 md:w-6 md:h-6 rounded flex items-center justify-center flex-shrink-0 transition-all border ${formData[item.key]
+                                            <div className={`mt-0.5 md:mt-0 w-4 h-4 md:w-6 md:h-6 rounded flex items-center justify-center flex-shrink-0 transition-all border ${formData[item.key]
                                                 ? 'bg-primary border-primary shadow-sm shadow-primary/20'
                                                 : 'bg-white dark:bg-white/5 border-slate-300 dark:border-white/10'
                                                 }`}>
                                                 {formData[item.key] && <Check size={10} strokeWidth={4} className="text-white" />}
                                             </div>
                                             <input type="checkbox" className="hidden" checked={formData[item.key]} onChange={e => update(item.key, e.target.checked)} />
-                                            <span className="text-[9px] md:text-xs font-black uppercase tracking-widest">{item.label}</span>
+                                            <div className="flex flex-col">
+                                                <span className="text-[9px] md:text-sm font-black uppercase tracking-widest">{item.label}</span>
+                                                <span className="text-[7px] md:text-[10px] text-slate-400 font-medium leading-[1.2] mt-0.5 md:mt-1 normal-case">{item.desc}</span>
+                                            </div>
                                         </label>
                                     ))}
                                 </div>

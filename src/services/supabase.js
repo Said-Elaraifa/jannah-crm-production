@@ -18,14 +18,14 @@ export async function getClients() {
     return data;
 }
 
-export async function getClientNameBySlug(slug) {
+export async function getClientInfoBySlug(slug) {
     const { data, error } = await supabase
         .from('clients')
-        .select('name')
+        .select('name, plan')
         .eq('slug', slug)
         .maybeSingle();
     if (error) return null;
-    return data?.name;
+    return data;
 }
 
 export async function addClientRecord(client) {
@@ -144,9 +144,20 @@ export async function saveCahier(slug, formData) {
         has_images: formData.hasImages,
         content_url: formData.contentUrl || null,
         additional_info: formData.additionalInfo,
+        // Social media & links
+        social_facebook: formData.socialFacebook || null,
+        social_instagram: formData.socialInstagram || null,
+        social_linkedin: formData.socialLinkedin || null,
+        social_tiktok: formData.socialTiktok || null,
+        social_youtube: formData.socialYoutube || null,
+        social_twitter: formData.socialTwitter || null,
+        website_url: formData.websiteUrl || null,
+        other_links: formData.otherLinks || null,
         completed_at: new Date().toISOString(),
     };
 
+
+    let savedData;
     if (existing) {
         const { data, error } = await supabase
             .from('cahier_des_charges')
@@ -155,7 +166,7 @@ export async function saveCahier(slug, formData) {
             .select()
             .single();
         if (error) throw error;
-        return data;
+        savedData = data;
     } else {
         const { data, error } = await supabase
             .from('cahier_des_charges')
@@ -163,8 +174,27 @@ export async function saveCahier(slug, formData) {
             .select()
             .single();
         if (error) throw error;
-        return data;
+        savedData = data;
     }
+
+    // ── Auto-update the client's cahier_completed flag ───────────────────────
+    // This ensures the CRM reflects the submission immediately via Realtime
+    try {
+        await supabase
+            .from('clients')
+            .update({
+                cahier_completed: true,
+                status: 'En Développement',
+                // Project name from cahier if client has no project set
+                project: formData.projectType || undefined,
+            })
+            .eq('slug', slug);
+    } catch (e) {
+        // Non-blocking: log but don't fail in case slug doesn't match
+        console.warn('[saveCahier] Could not update client status:', e.message);
+    }
+
+    return savedData;
 }
 
 export async function updateCahierPrompt(slug, prompt) {
@@ -184,7 +214,10 @@ export async function getLeads() {
 }
 
 export async function addLeadRecord(lead) {
-    const { data, error } = await supabase.from('leads').insert([lead]).select().single();
+    // Always strip id and created_at — Supabase generates them (uuid + timestamptz)
+    // This prevents any upstream temp IDs (e.g. "csv_...") from causing 400 errors.
+    const { id: _id, created_at: _cat, ...cleanLead } = lead;
+    const { data, error } = await supabase.from('leads').insert([cleanLead]).select().single();
     if (error) throw error;
 
     logActivity({

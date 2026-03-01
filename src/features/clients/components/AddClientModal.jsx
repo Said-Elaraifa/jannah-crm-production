@@ -5,6 +5,7 @@ import { SERVICE_ICONS } from '../constants';
 export const AddClientModal = memo(({ isOpen, onClose, onAdd, currentUser }) => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
+    const [plan, setPlan] = useState('Standard');
     const [selectedServices, setSelectedServices] = useState(['Web']);
     const [loading, setLoading] = useState(false);
     const [successData, setSuccessData] = useState(null);
@@ -14,6 +15,7 @@ export const AddClientModal = memo(({ isOpen, onClose, onAdd, currentUser }) => 
         setTimeout(() => {
             setName('');
             setEmail('');
+            setPlan('Standard');
             setSelectedServices(['Web']);
             setSuccessData(null);
         }, 300);
@@ -27,6 +29,7 @@ export const AddClientModal = memo(({ isOpen, onClose, onAdd, currentUser }) => 
             await onAdd({
                 name,
                 email,
+                plan,
                 services: selectedServices,
                 status: 'Nouveau',
                 progress: 0,
@@ -108,6 +111,29 @@ export const AddClientModal = memo(({ isOpen, onClose, onAdd, currentUser }) => 
                                         className="w-full bg-black/40 border border-white/5 rounded-2xl px-6 py-4 text-white focus:border-accent/50 outline-none transition-all font-bold placeholder:text-slate-700"
                                         placeholder="contact@jannah.os"
                                     />
+                                </div>
+
+                                <div className="space-y-4">
+                                    <label className="text-[10px] md:text-xs font-black uppercase tracking-widest text-slate-500 ml-1">Plan / Offre</label>
+                                    <div className="grid grid-cols-3 gap-3">
+                                        {[
+                                            { id: 'Mini', title: 'Mini', desc: '79€/mois', feat: '1 feat.' },
+                                            { id: 'Standard', title: 'Standard', desc: '149€/mois', feat: '2 feats.' },
+                                            { id: 'Pro', title: 'Pro', desc: '499€/mois', feat: '3 feats.' }
+                                        ].map(p => (
+                                            <button
+                                                key={p.id}
+                                                type="button"
+                                                onClick={() => setPlan(p.id)}
+                                                className={`p-3 rounded-xl border transition-colors font-bold text-center flex flex-col items-center justify-center gap-1 ${plan === p.id ? 'bg-accent/10 border-accent/30 text-accent shadow-lg shadow-accent/5' : 'bg-black/20 border-white/5 text-slate-400 hover:bg-white/5 hover:text-white'}`}
+                                            >
+                                                <span className="text-sm">{p.title}</span>
+                                                <span className={`text-[10px] px-2 py-0.5 rounded-full ${plan === p.id ? 'bg-accent/20 text-accent' : 'bg-white/10 text-slate-400'}`}>
+                                                    {p.desc}
+                                                </span>
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
 
                                 <div className="space-y-4">

@@ -164,15 +164,14 @@ export function usePipelineLogic(leads, setLeads, { onAddLead, onEditLead, onMov
     }, [onAddLead, setLeads]);
 
     // ─── CSV Bulk Import ───────────────────────────────────
-    const importLeadsFromCSV = useCallback((rows) => {
+    const importLeadsFromCSV = useCallback(async (rows) => {
         /**
          * rows: Array of objects from parsed CSV, e.g.:
          * [{ Nom: "...", Email: "...", Tel: "...", Source: "LinkedIn", Entreprise: "...", Valeur: "2500" }]
          */
-        const mapped = rows.map((row, i) => {
+        const mapped = rows.map((row) => {
             const source = row.Source || row.source || row['Réseau'] || row.reseau || 'Inbound';
             return {
-                id: `csv_${Date.now()}_${i}`,
                 company: row.Entreprise || row.Company || row.entreprise || row.Nom || '',
                 contact: row.Nom || row.Contact || row.contact || row.Name || '',
                 email: row.Email || row.email || row.Mail || '',
@@ -191,7 +190,7 @@ export function usePipelineLogic(leads, setLeads, { onAddLead, onEditLead, onMov
         });
 
         if (onAddLead) {
-            mapped.forEach(lead => onAddLead(lead));
+            await Promise.all(mapped.map(lead => onAddLead(lead)));
         } else {
             setLeads(prev => [...mapped, ...prev]);
         }

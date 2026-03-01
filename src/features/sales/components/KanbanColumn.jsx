@@ -1,7 +1,7 @@
 import { Plus } from 'lucide-react';
 import { LeadCard } from './LeadCard';
 
-export function KanbanColumn({ stage, stageLeads, stages, isOver, onDragOver, onDrop, onOpenAdd, moveLead, deleteLead, openEdit, handleAudit, handleDragStart, handleDragEnd }) {
+export function KanbanColumn({ stage, stageLeads, stages, isOver, onDragOver, onDrop, onOpenAdd, moveLead, deleteLead, openEdit, handleAudit, handleDragStart, handleDragEnd, selectedLeads = [], onToggleSelect }) {
     const stageTotal = stageLeads.reduce((sum, l) => sum + (l.value || 0), 0);
 
     return (
@@ -37,6 +37,8 @@ export function KanbanColumn({ stage, stageLeads, stages, isOver, onDragOver, on
                         onAudit={handleAudit}
                         onDragStart={handleDragStart}
                         onDragEnd={handleDragEnd}
+                        isSelected={selectedLeads.includes(lead.id)}
+                        onToggleSelect={() => onToggleSelect(lead.id)}
                     />
                 ))}
                 {stageLeads.length === 0 && (

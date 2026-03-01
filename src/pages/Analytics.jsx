@@ -52,27 +52,33 @@ export default function Analytics() {
     return (
         <div className="w-full space-y-8 pb-10 animate-fade-in">
             {/* Header Area */}
-            <div className="relative mb-8 z-10 w-full">
+            <div className="relative mb-4 z-10 w-full">
                 <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-accent/20 blur-[120px] rounded-full mix-blend-screen pointer-events-none -translate-y-1/2 animate-pulse-glow" />
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10 w-full">
-                    <div>
-                        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-accent/10 border border-accent/20 rounded-full text-[10px] md:text-xs font-black uppercase tracking-widest text-accent mb-6 shadow-[0_0_15px_rgba(238,180,23,0.2)]">
-                            <BarChart2 size={12} className="animate-pulse" /> Data Center
+                <div className="flex flex-col gap-6 relative z-10 w-full">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-accent/10 border border-accent/20 rounded-full text-[10px] md:text-xs font-black uppercase tracking-widest text-accent mb-4 shadow-[0_0_15px_rgba(238,180,23,0.2)]">
+                                <BarChart2 size={12} className="animate-pulse" /> Data Center
+                            </div>
+                            <h1 className="text-3xl md:text-5xl font-display font-black tracking-tight mb-2 text-slate-900 dark:text-white flex flex-wrap items-center gap-4">
+                                Analytics &amp; <span className="text-accent underline decoration-accent/30 underline-offset-8">Ads</span>
+                            </h1>
+                            <p className="text-slate-500 dark:text-slate-400 max-w-2xl text-sm md:text-lg leading-relaxed font-medium">
+                                Votre centre de commande personnel. Gérez vos budgets et optimisez vos performances publicitaires.
+                            </p>
                         </div>
-                        <h1 className="text-4xl md:text-5xl font-display font-black tracking-tight mb-4 text-slate-900 dark:text-white flex flex-wrap items-center gap-4">
-                            Analytics & <span className="text-accent underline decoration-accent/30 underline-offset-8">Ads</span>
-                        </h1>
-                        <p className="text-slate-500 dark:text-slate-400 max-w-2xl text-base md:text-lg leading-relaxed font-medium mt-4">
-                            Votre centre de commande personnel. Gérez vos budgets et optimisez vos performances publicitaires.
-                        </p>
                     </div>
-                    <div className="flex bg-white/50 dark:bg-surface-dark/40 backdrop-blur-md rounded-2xl border border-slate-200 dark:border-white/10 p-1 shadow-sm overflow-x-auto custom-scrollbar">
-                        {TABS.map(tab => (
-                            <TabButton key={tab.id} {...tab} active={activeTab === tab.id} onClick={setActiveTab} />
-                        ))}
+                    {/* Tabs — full-width on mobile with horizontal scroll */}
+                    <div className="w-full overflow-x-auto pb-1 -mx-1 px-1">
+                        <div className="flex bg-white/50 dark:bg-surface-dark/40 backdrop-blur-md rounded-2xl border border-slate-200 dark:border-white/10 p-1 shadow-sm w-max md:w-full min-w-full">
+                            {TABS.map(tab => (
+                                <TabButton key={tab.id} {...tab} active={activeTab === tab.id} onClick={setActiveTab} />
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>
+
 
             {/* Content Switcher */}
             {activeTab === 'dashboard' && (

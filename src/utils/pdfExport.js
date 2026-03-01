@@ -7,12 +7,13 @@ async function loadLogo() {
     return new Promise((resolve) => {
         const img = new Image();
         img.crossOrigin = 'Anonymous';
-        img.src = '/logo-jannah.svg';
+        img.src = '/logo-jannah-icon.svg';
         img.onload = () => {
             const canvas = document.createElement('canvas');
             canvas.width = img.width * 4; // High res
             canvas.height = img.height * 4;
             const ctx = canvas.getContext('2d');
+            // Force white color for the logo if possible, or just draw it
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
             resolve(canvas.toDataURL('image/png'));
         };
@@ -36,43 +37,51 @@ export async function exportDashboardToPDF(kpis = KPIS_DATA, adsKpis = ADS_KPIS_
     const contentWidth = pageWidth - margin * 2;
     let y = margin;
 
-    // Colors
-    const primaryColor = [5, 109, 71];
-    const accentColor = [238, 180, 23];
-    const secondaryColor = [195, 220, 127];
-    const darkBg = [18, 32, 44];
-    const surfaceDark = [28, 49, 68];
-    const textLight = [254, 255, 255];
-    const textMuted = [148, 163, 184];
+    // Colors (Match Dark Glassmorphism Theme)
+    const bgDark = [15, 23, 42];        // slate-900 equivalent for base background
+    const surfaceDark = [30, 41, 59];   // slate-800 for cards
+    const accentColor = [238, 180, 23]; // Jannah Yellow
+    const secondaryColor = [195, 220, 127]; // Jannah Lime
+    const textLight = [248, 250, 252];  // slate-50
+    const textMuted = [148, 163, 184];  // slate-400
+    const borderDark = [51, 65, 85];    // slate-700
 
     // Background
-    doc.setFillColor(...darkBg);
+    doc.setFillColor(...bgDark);
     doc.rect(0, 0, pageWidth, pageHeight, 'F');
 
-    // Header bar
-    doc.setFillColor(...primaryColor);
+    // Header bar (Subtle surface color, not flat green)
+    doc.setFillColor(...surfaceDark);
     doc.rect(0, 0, pageWidth, 35, 'F');
+    // Bottom border for header
+    doc.setDrawColor(...borderDark);
+    doc.setLineWidth(0.5);
+    doc.line(0, 35, pageWidth, 35);
 
     // Load and add Logo
     const logoData = await loadLogo();
     if (logoData) {
-        // Logo ratio 480x120 = 4:1
-        doc.addImage(logoData, 'PNG', margin, 12, 40, 10);
+        // Draw icon
+        doc.addImage(logoData, 'PNG', margin, 12, 10, 10);
+        // Draw Text "Jannah" next to it
+        doc.setTextColor(...textLight);
+        doc.setFontSize(18);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Jannah', margin + 14, 20);
     } else {
         // Fallback text if logo fails
-        doc.setTextColor(255, 255, 255);
-        doc.setFontSize(16);
+        doc.setTextColor(...textLight);
+        doc.setFontSize(18);
         doc.setFont('helvetica', 'bold');
         doc.text('JANNAH', margin, 20);
     }
 
 
     // Title
-    doc.setTextColor(...textLight);
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'normal');
     doc.setTextColor(...accentColor);
-    doc.text('RAPPORT CEO — PERFORMANCE DASHBOARD', margin + 45, 23); // Shifted right depending on logo
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.text('RAPPORT CEO — PERFORMANCE DASHBOARD', margin + 60, 20); // Shifted right
 
 
     // Date
@@ -89,7 +98,7 @@ export async function exportDashboardToPDF(kpis = KPIS_DATA, adsKpis = ADS_KPIS_
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
     doc.text('KPIs PRINCIPAUX', margin, y);
-    doc.setDrawColor(...primaryColor);
+    doc.setDrawColor(...secondaryColor);
     doc.setLineWidth(0.5);
     doc.line(margin, y + 2, margin + 40, y + 2);
     y += 10;
@@ -143,7 +152,7 @@ export async function exportDashboardToPDF(kpis = KPIS_DATA, adsKpis = ADS_KPIS_
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
     doc.text('REVENUS VS DÉPENSES ADS (8 DERNIERS MOIS)', margin, y);
-    doc.setDrawColor(...primaryColor);
+    doc.setDrawColor(...secondaryColor);
     doc.line(margin, y + 2, margin + 80, y + 2);
     y += 10;
 
@@ -197,7 +206,7 @@ export async function exportDashboardToPDF(kpis = KPIS_DATA, adsKpis = ADS_KPIS_
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
     doc.text('PERFORMANCE PUBLICITAIRE', margin, y);
-    doc.setDrawColor(...primaryColor);
+    doc.setDrawColor(...secondaryColor);
     doc.line(margin, y + 2, margin + 60, y + 2);
     y += 10;
 
@@ -218,13 +227,16 @@ export async function exportDashboardToPDF(kpis = KPIS_DATA, adsKpis = ADS_KPIS_
     y += 35;
 
     // Footer
-    doc.setFillColor(...surfaceDark);
+    doc.setFillColor(...bgDark);
     doc.rect(0, pageHeight - 20, pageWidth, 20, 'F');
+    doc.setDrawColor(...borderDark);
+    doc.line(margin, pageHeight - 20, pageWidth - margin, pageHeight - 20);
+
     doc.setTextColor(...textMuted);
     doc.setFontSize(7);
     doc.setFont('helvetica', 'normal');
-    doc.text('© 2024 Jannah Agency — Confidentiel — ismael@jannah.co', pageWidth / 2, pageHeight - 8, { align: 'center' });
-    doc.setTextColor(...primaryColor);
+    doc.text('© 2024 Jannah Agency — Confidentiel', pageWidth / 2, pageHeight - 8, { align: 'center' });
+    doc.setTextColor(...secondaryColor);
     doc.text('jannah.co', pageWidth - margin, pageHeight - 8, { align: 'right' });
 
     // Save
